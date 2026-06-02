@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="zh"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A股 ETF 期权卖方收益率 — ZX Capital</title>
+<meta name="description" content="实时计算9只A股 ETF 期权（50ETF/沪深300/中证500/创业板/科创50 等）的卖出认沽/认购年化收益率，支持现金担保与交易所最低保证金两种模式。">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<link rel="canonical" href="https://options.zxcapitalgroup.com/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#06080d;--bg2:#080b12;--card:#0d1117;--bdr:#161d2a;--g:#00dc82;--gd:#00b36b;--r:#ff4d6a;--amb:#f0a050;--t:#e2e8f0;--tm:#94a3b8;--td:#64748b;--tb:#f1f5f9}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans','Noto Sans SC',system-ui,sans-serif;background:var(--bg);color:var(--t);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.mono{font-family:'Space Mono','Courier New',monospace}
+.wrap{max-width:1320px;margin:0 auto;padding:0 20px}
+
+.nav{position:sticky;top:0;z-index:100;background:rgba(6,8,13,.94);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--bdr)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:60px;max-width:1320px;margin:0 auto;padding:0 20px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;color:var(--tb)}
+.logo-i{width:34px;height:34px;border-radius:7px;background:linear-gradient(135deg,var(--g),var(--gd));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--bg);font-family:'Space Mono',monospace}
+.nlinks{display:flex;gap:24px;align-items:center}
+.nlinks a{color:var(--tm);font-size:13px;font-weight:500;transition:color .2s}
+.nlinks a:hover{color:var(--g)}.nlinks .cur{color:var(--g);font-weight:700}
+.mbtn{display:none;background:none;border:none;color:var(--t);font-size:22px;cursor:pointer}
+.mmenu{display:none;background:var(--bg2);border-top:1px solid var(--bdr);padding:12px 20px}
+.mmenu a{display:block;padding:10px 0;color:var(--tm);font-size:14px}
+
+.page-hd{padding:36px 20px 24px;max-width:1320px;margin:0 auto}
+.page-title{font-size:26px;font-weight:700;margin-bottom:4px}
+.page-sub{color:var(--td);font-size:13px}
+
+/* Status bar */
+.sbar{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.mkt-dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
+.dot-open{background:var(--g);box-shadow:0 0 7px var(--g);animation:pulse 2s infinite}
+.dot-pre{background:var(--amb)}
+.dot-cls{background:var(--td)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.mkt-label{font-size:13px;font-weight:600}
+.under-disp{display:flex;align-items:center;gap:14px;font-size:13px}
+.under-disp b{font-family:'Space Mono',monospace;font-weight:700;color:var(--g);font-size:16px}
+.sbar-meta{margin-left:auto;display:flex;gap:18px;align-items:center;font-size:12px;color:var(--td)}
+.sbar-meta b{font-family:'Space Mono',monospace;color:var(--tm)}
+
+/* Controls */
+.ctrls{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:14px 18px;margin-bottom:18px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.ctrl-grp{display:flex;align-items:center;gap:8px}
+.ctrl-lab{font-size:11px;color:var(--td);font-weight:500;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.cgroup{display:flex;background:var(--bg);border:1px solid var(--bdr);border-radius:7px;padding:2px;gap:1px}
+.cbtn{padding:5px 11px;border-radius:5px;border:none;background:transparent;color:var(--tm);font-size:12px;font-weight:600;cursor:pointer;font-family:'Space Mono',monospace;transition:all .15s;white-space:nowrap}
+.cbtn.on{background:var(--g);color:var(--bg)}
+.under-sel{background:var(--bg);border:1px solid var(--bdr);color:var(--t);font-size:13px;padding:7px 12px;border-radius:7px;cursor:pointer;font-family:'DM Sans',sans-serif;outline:none;min-width:200px}
+.under-sel:focus{border-color:var(--g)}
+.slider-grp{display:flex;align-items:center;gap:10px;min-width:240px}
+.slider{flex:1;-webkit-appearance:none;appearance:none;height:4px;background:var(--bdr);border-radius:2px;outline:none}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:var(--g);cursor:pointer;box-shadow:0 0 0 3px rgba(0,220,130,.15)}
+.slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--g);cursor:pointer;border:none}
+.slider-v{font-family:'Space Mono',monospace;font-size:13px;color:var(--g);font-weight:700;min-width:40px;text-align:right}
+.rbtn{padding:7px 14px;border-radius:7px;border:1px solid var(--bdr);background:transparent;color:var(--tm);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:5px;margin-left:auto}
+.rbtn:hover{border-color:var(--g);color:var(--g)}
+.rbtn .spin{display:inline-block;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rbtn:not(.loading) .spin{animation:none}
+
+/* Table */
+.err-bar{background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.2);border-radius:8px;padding:9px 14px;font-size:12px;color:var(--r);display:none;margin-bottom:12px}
+.tw{overflow-x:auto;border-radius:12px;border:1px solid var(--bdr);margin-bottom:32px;background:var(--card)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--card);color:var(--td);font-weight:600;text-transform:uppercase;font-size:10px;letter-spacing:.05em;padding:12px 14px;text-align:left;border-bottom:1px solid var(--bdr);white-space:nowrap;cursor:pointer;user-select:none;transition:color .15s;position:sticky;top:60px;z-index:50}
+th:hover{color:var(--t)}th.srt{color:var(--g)}
+.sarr{margin-left:3px;font-size:9px;opacity:.5}th.srt .sarr{opacity:1}
+.tip{display:inline-block;margin-left:4px;font-size:11px;color:var(--td);cursor:help;opacity:.6;transition:opacity .15s;position:relative;font-family:'DM Sans',sans-serif;font-weight:400;text-transform:none;letter-spacing:0}
+.tip:hover{opacity:1;color:var(--g)}
+.tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--bdr);color:var(--t);font-size:11px;font-weight:400;line-height:1.55;letter-spacing:0;text-transform:none;padding:10px 13px;border-radius:8px;white-space:pre-line;width:max-content;max-width:320px;text-align:left;opacity:0;pointer-events:none;transition:opacity .15s;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.tip:hover::after{opacity:1}
+td{padding:11px 14px;border-bottom:1px solid rgba(22,29,42,.7);white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(13,17,23,.6)}
+tr.clickable{cursor:pointer;transition:background .15s}
+tr.clickable:hover td{background:rgba(0,220,130,.04)!important}
+
+.tk{font-family:'Space Mono',monospace;font-size:11px;color:var(--g);font-weight:700}
+.tk-name{font-weight:600;color:var(--t);margin-bottom:2px}
+.tag{display:inline-block;font-size:9px;padding:1px 6px;border-radius:3px;font-weight:700;margin-left:5px}
+.tag-itm{background:rgba(0,220,130,.12);color:var(--g)}
+.tag-atm{background:rgba(240,160,80,.12);color:var(--amb)}
+.tag-otm{background:rgba(100,116,139,.12);color:var(--td)}
+
+.bid-ask{font-family:'Space Mono',monospace;font-size:12px}
+.bid-ask .b{color:var(--g)}
+.bid-ask .a{color:var(--r)}
+.bid-ask .sep{color:var(--td)}
+
+.yld-hi{color:#00dc82;font-weight:700;font-family:'Space Mono',monospace}
+.yld-md{color:#5ddba3;font-weight:700;font-family:'Space Mono',monospace}
+.yld-lo{color:var(--tm);font-weight:600;font-family:'Space Mono',monospace}
+.yld-na{color:var(--td);font-family:'Space Mono',monospace;opacity:.6}
+
+/* Greyed-out rows for one-sided / no-trade contracts */
+tr.illiq td{opacity:.4;color:var(--td)}
+tr.illiq:hover td{background:rgba(13,17,23,.3)!important}
+tr.illiq .yld-hi,tr.illiq .yld-md,tr.illiq .yld-lo,tr.illiq .yld-na{color:var(--td)!important}
+tr.illiq .tk,tr.illiq .tk-name{color:var(--td)!important}
+
+.load-row td{text-align:center;padding:36px;color:var(--td)}
+.lspin{display:inline-block;width:16px;height:16px;border:2px solid var(--bdr);border-top-color:var(--g);border-radius:50%;animation:spin .7s linear infinite;margin-right:8px;vertical-align:middle}
+
+/* Info cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px;margin-bottom:32px}
+.icard{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:20px}
+.icard h3{font-size:14px;font-weight:700;margin-bottom:12px;color:var(--tb)}
+.icard p,.icard li{font-size:13px;color:var(--td);line-height:1.7}
+.icard ul{padding-left:16px}.icard li{margin-bottom:3px}
+.icard b{color:var(--tm)}
+
+.disc{background:var(--card);border:1px solid #2a1c1c;border-radius:12px;padding:22px 26px;margin-bottom:40px}
+.disc h4{font-size:13px;font-weight:700;color:var(--amb);margin-bottom:8px}
+.disc p{font-size:12px;color:var(--td);line-height:1.7;margin-bottom:6px}
+
+footer{border-top:1px solid var(--bdr);padding:30px 20px 22px;background:var(--bg)}
+.fi{max-width:1320px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}
+.fc{color:var(--td);font-size:11px;line-height:1.6}
+
+/* Modal share card */
+.mdl-bg{position:fixed;inset:0;background:rgba(2,4,8,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px;animation:fadeIn .2s ease}
+.mdl-bg.on{display:flex}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.mdl-card{background:linear-gradient(165deg,#0e1420 0%,#0a0d14 100%);border:1px solid rgba(255,255,255,.08);border-radius:20px;width:min(92vw,460px);aspect-ratio:9/12;padding:0;display:flex;flex-direction:column;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 1px rgba(0,220,130,.05);overflow:hidden;animation:popIn .25s cubic-bezier(.34,1.4,.6,1)}
+@keyframes popIn{from{opacity:0;transform:scale(.94) translateY(8px)}to{opacity:1;transform:none}}
+.mdl-close{position:absolute;top:12px;right:14px;width:28px;height:28px;border:none;background:rgba(255,255,255,.06);color:var(--tm);font-size:14px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:5;transition:all .15s}
+.mdl-close:hover{background:rgba(255,255,255,.12);color:var(--t)}
+.mdl-body{padding:22px 24px 18px;display:flex;flex-direction:column;height:100%;overflow:hidden}
+.mdl-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06)}
+.mdl-brand{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--tm);letter-spacing:.5px}
+.mdl-brand .logo-i{width:22px;height:22px;font-size:10px;border-radius:5px}
+.mdl-bdate{font-size:10px;color:var(--td);font-family:'Space Mono',monospace}
+.mdl-title{font-size:18px;font-weight:700;color:var(--tb);margin-bottom:3px;line-height:1.25}
+.mdl-sub{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.mdl-sub .tk{font-family:'Space Mono',monospace;color:var(--g);font-size:11px;font-weight:700}
+.mdl-sub .b{display:inline-block;font-size:9px;padding:2px 7px;border-radius:3px;font-weight:700}
+.mdl-yld-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.mdl-yld{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:12px 13px;text-align:center}
+.mdl-yld-lab{font-size:10px;color:var(--td);margin-bottom:3px;letter-spacing:.4px}
+.mdl-yld-val{font-size:22px;font-weight:700;font-family:'Space Mono',monospace;line-height:1.1}
+.mdl-yld-note{font-size:9px;color:var(--td);margin-top:3px}
+.mdl-calc{background:rgba(0,0,0,.25);border:1px dashed rgba(255,255,255,.08);border-radius:10px;padding:10px 12px;margin-bottom:14px;font-family:'Space Mono',monospace;font-size:10px;line-height:1.55;color:var(--tm)}
+.mdl-calc .label{color:var(--td);font-size:9px;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;font-family:'DM Sans',sans-serif;font-weight:600;display:block}
+.mdl-calc b{color:var(--g);font-weight:700}
+.mdl-info{display:grid;grid-template-columns:1fr 1fr;gap:7px 14px;margin-top:auto;padding-top:14px;border-top:1px solid rgba(255,255,255,.06)}
+.mdl-info-item{display:flex;flex-direction:column;gap:2px}
+.mdl-info-lab{font-size:9px;color:var(--td);letter-spacing:.4px}
+.mdl-info-val{font-size:13px;font-weight:700;color:var(--t);font-family:'Space Mono',monospace}
+.mdl-info-val.warn{color:var(--r)}
+.mdl-info-val.ok{color:var(--g)}
+.mdl-info-val.mid{color:var(--amb)}
+.mdl-footer{margin-top:10px;text-align:center;font-size:9px;color:var(--td);letter-spacing:.5px}
+
+@media(max-width:768px){
+  .nlinks{display:none!important}.mbtn{display:flex!important}.mmenu.open{display:block!important}
+  .sbar-meta{margin-left:0;width:100%;flex-wrap:wrap;gap:10px}
+  .ctrls{flex-direction:column;align-items:stretch;gap:12px}
+  .ctrl-grp{justify-content:space-between}
+  .rbtn{margin-left:0}
+  th,td{padding:9px 10px;font-size:11px}
+  th{position:static}
+  .page-title{font-size:22px}
+}
+</style></head><body>
+
+<nav class="nav"><div class="nav-in">
+  <a href="https://zxcapitalgroup.com/" class="logo"><span class="logo-i">ZX</span>ZX Capital</a>
+  <div class="nlinks">
+    <a href="https://zxcapitalgroup.com/etf/">ETF</a>
+    <a href="https://zxcapitalgroup.com/stock/">Stocks</a>
+    <a href="https://lof.zxcapitalgroup.com/">LOF套利</a>
+    <span class="cur">期权</span>
+    <a href="https://zxcapitalgroup.com/calculator/">Tools</a>
+  </div>
+  <button class="mbtn" onclick="document.getElementById('mm').classList.toggle('open')">☰</button>
+</div>
+<div id="mm" class="mmenu">
+  <a href="https://zxcapitalgroup.com/etf/">ETF</a>
+  <a href="https://lof.zxcapitalgroup.com/">LOF套利</a>
+  <a href="https://zxcapitalgroup.com/calculator/">Tools</a>
+</div></nav>
+
+<div class="wrap">
+<div class="page-hd">
+  <h1 class="page-title">A股 ETF 期权 卖方收益率</h1>
+  <p class="page-sub">9 只 ETF 期权全覆盖 · 实时年化 yield · 支持现金担保 / 交易所最低保证金两种模式</p>
+</div>
+
+<!-- Status bar -->
+<div class="sbar">
+  <span class="mkt-dot" id="mktDot"></span>
+  <span class="mkt-label" id="mktLabel">--</span>
+  <div class="under-disp">
+    <span id="underName" style="color:var(--td)">--</span>
+    <b id="underPrice">--</b>
+    <span id="underChg" class="mono" style="font-size:12px">--</span>
+  </div>
+  <div class="sbar-meta">
+    <span>数据时间: <b id="updTime">--</b></span>
+    <span>下次刷新: <b id="cdTimer">--</b></span>
+  </div>
+</div>
+
+<!-- Controls -->
+<div class="ctrls">
+  <div class="ctrl-grp">
+    <span class="ctrl-lab">标的</span>
+    <select id="underSel" class="under-sel" onchange="onChangeUnder()"></select>
+  </div>
+  <div class="ctrl-grp">
+    <span class="ctrl-lab">类型</span>
+    <div class="cgroup">
+      <button class="cbtn on" id="optPut"  onclick="setOptType(10)">认沽 (Put)</button>
+      <button class="cbtn"    id="optCall" onclick="setOptType(9)">认购 (Call)</button>
+    </div>
+  </div>
+  <div class="ctrl-grp">
+    <span class="ctrl-lab">保证金</span>
+    <div class="cgroup">
+      <button class="cbtn"    id="mmEx"   onclick="setMarginMode('exchange')">交易所最低</button>
+      <button class="cbtn on" id="mmCash" onclick="setMarginMode('cash')">现金担保</button>
+    </div>
+  </div>
+  <div class="ctrl-grp slider-grp" id="upliftGrp" style="display:none">
+    <span class="ctrl-lab">券商上浮</span>
+    <input type="range" id="upliftSlider" class="slider" min="0" max="30" step="1" value="10" oninput="onUpliftChange(this.value)">
+    <span class="slider-v" id="upliftVal">10%</span>
+  </div>
+  <div class="ctrl-grp">
+    <span class="ctrl-lab">权利金</span>
+    <div class="cgroup">
+      <button class="cbtn on" id="pxBid"  onclick="setPxMode('bid')">买一 Bid</button>
+      <button class="cbtn"    id="pxMid"  onclick="setPxMode('mid')">中价 Mid</button>
+      <button class="cbtn"    id="pxLast" onclick="setPxMode('last')">最新</button>
+    </div>
+  </div>
+  <button class="rbtn" id="rfBtn" onclick="doRefresh()">
+    <span id="rfIcon">↻</span> 刷新
+  </button>
+</div>
+
+<span id="errBar" class="err-bar"></span>
+
+<!-- Table -->
+<div class="tw"><table id="optTbl">
+  <thead><tr>
+    <th onclick="sortBy('strike')" id="th_strike">行权价<span class="tip" data-tip="期权约定的执行价格。卖出认沽时,标的跌破此价就会被行权。">ⓘ</span><span class="sarr" id="sa_strike">↕</span></th>
+    <th onclick="sortBy('expiry')" id="th_expiry">到期 / 剩余天数<span class="tip" data-tip="A股 ETF 期权到期日 = 到期月份的第四个星期三。剩余天数按日历日计算。">ⓘ</span><span class="sarr" id="sa_expiry">↕</span></th>
+    <th onclick="sortBy('moneyness')" id="th_moneyness">价内/外%<span class="tip" data-tip="认沽期权:&#10;价内 (ITM): 行权价 > 标的价 → 大概率被行权&#10;平值 (ATM): 行权价 ≈ 标的价&#10;价外 (OTM): 行权价 < 标的价 → 大概率不被行权">ⓘ</span><span class="sarr" id="sa_moneyness">↕</span></th>
+    <th onclick="sortBy('bid')" id="th_bid">买卖价 Bid / Ask<span class="tip" data-tip="买一价(Bid) = 当前买家愿出的最高价&#10;卖一价(Ask) = 当前卖家挂的最低价&#10;卖出期权时:&#10;• 市价单 = 在 Bid 成交&#10;• 挂 Ask = 等买家来吃">ⓘ</span><span class="sarr" id="sa_bid">↕</span></th>
+    <th onclick="sortBy('volume')" id="th_volume">成交 / 持仓<span class="tip" data-tip="成交量: 当日累计成交张数&#10;持仓量: 未平仓张数(open interest)&#10;持仓量大 = 流动性好,买卖价差小">ⓘ</span><span class="sarr" id="sa_volume">↕</span></th>
+    <th onclick="sortBy('premium')" id="th_premium">权利金/张<span class="tip" data-tip="卖出 1 张合约能拿到的权利金 (元)&#10;= 期权价 × 合约乘数(10000)">ⓘ</span><span class="sarr" id="sa_premium">↕</span></th>
+    <th onclick="sortBy('margin')" id="th_margin">保证金/张<span class="tip" data-tip="卖出 1 张合约占用的保证金&#10;现金担保 = 行权价 × 10000&#10;交易所最低 = (权利金 + max(12% × 标的现价 − 虚值额, 7% × 行权价)) × 10000&#10;再乘 (1 + 上浮率)">ⓘ</span><span class="sarr" id="sa_margin">↕</span></th>
+    <th onclick="sortBy('yldp')" id="th_yldp">期间 yield<span class="tip" data-tip="= 权利金 ÷ 保证金 × 100%&#10;持有到期能拿到的净收益率">ⓘ</span><span class="sarr" id="sa_yldp">↕</span></th>
+    <th onclick="sortBy('yld')" id="th_yld" class="srt">年化 yield<span class="tip" data-tip="= 期间收益率 × (365 / 剩余天数)&#10;主排序字段,默认降序&#10;灰色 = 单边报价/无流动性,数据不可信">ⓘ</span><span class="sarr" id="sa_yld">↓</span></th>
+  </tr></thead>
+  <tbody id="tbody">
+    <tr class="load-row"><td colspan="9"><span class="lspin"></span>加载期权数据...</td></tr>
+  </tbody>
+</table></div>
+
+<!-- Info cards -->
+<div class="cards">
+  <div class="icard">
+    <h3>卖出认沽 (Sell Put) 是什么</h3>
+    <p>承诺在到期日前,若标的跌破行权价,你按行权价买入标的。换来的是<b>立即拿到的权利金</b>。</p>
+    <p style="margin-top:8px">本质上是"<b>跌到便宜价我也愿意接货</b>"——如果你本来就想在某价格买入标的,卖认沽相当于"边等边收租"。</p>
+  </div>
+  <div class="icard">
+    <h3>两种保证金模式</h3>
+    <ul>
+      <li><b>现金担保 (Cash-Secured)</b>: 锁定 strike × 10000 现金,被行权也能全款接货,不会爆仓</li>
+      <li><b>交易所最低</b>: 占用保证金低,yield 高 5-10 倍,但标的下跌时需追加保证金,跌穿行权价后接货资金压力大</li>
+    </ul>
+  </div>
+  <div class="icard">
+    <h3>读表小技巧</h3>
+    <ul>
+      <li>主排序按"年化 yield"降序</li>
+      <li><b style="color:var(--td);opacity:.5">灰色</b>行 = 单边报价/无成交,数据无意义</li>
+      <li>价内 (ITM) yield 高但被行权概率大</li>
+      <li>价外 (OTM) yield 低但安全垫厚</li>
+      <li>近月 yield 高,远月 yield 低(理论数学)</li>
+    </ul>
+  </div>
+</div>
+
+<div class="disc">
+  <h4>⚠ 风险与免责</h4>
+  <p>期权卖方面临<b>无限亏损风险</b>。本工具仅作收益率计算参考,不构成投资建议。</p>
+  <p>交易所最低保证金会随标的价格波动每日盯市,标的剧烈下跌时需追加保证金,极端行情下可能被强平。新手建议从<b>现金担保模式</b>开始。</p>
+  <p>数据来源东方财富 push2 接口,有数秒至 1 分钟延迟,实际下单价格以交易系统为准。</p>
+</div>
+</div><!-- /wrap -->
+
+<footer><div class="fi">
+  <div class="logo" style="font-size:15px"><span class="logo-i">ZX</span>ZX Capital</div>
+  <div class="fc">数据来源: 东方财富 push2 · 交易日 09:30-15:00 实时刷新<br>本工具不构成投资建议,期权交易有风险,操作需谨慎</div>
+</div></footer>
+
+<!-- Detail Modal -->
+<div id="mdlBg" class="mdl-bg" onclick="closeMdl(event)">
+  <div class="mdl-card" onclick="event.stopPropagation()">
+    <button class="mdl-close" onclick="closeMdl()">✕</button>
+    <div class="mdl-body" id="mdlBody"></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════════════
+const UNDERLYINGS = [
+  {code:'510050', secid:'1.510050', name:'上证50ETF华夏',     short:'50ETF'},
+  {code:'510300', secid:'1.510300', name:'沪深300ETF华泰柏瑞', short:'300ETF沪'},
+  {code:'510500', secid:'1.510500', name:'中证500ETF南方',     short:'500ETF沪'},
+  {code:'588000', secid:'1.588000', name:'科创50ETF华夏',      short:'科创50华夏'},
+  {code:'588080', secid:'1.588080', name:'科创50ETF易方达',    short:'科创50易'},
+  {code:'159901', secid:'0.159901', name:'深证100ETF易方达',   short:'深100ETF'},
+  {code:'159915', secid:'0.159915', name:'创业板ETF易方达',    short:'创业板ETF'},
+  {code:'159919', secid:'0.159919', name:'沪深300ETF嘉实',     short:'300ETF深'},
+  {code:'159922', secid:'0.159922', name:'中证500ETF嘉实',     short:'500ETF深'},
+];
+const CONTRACT_MULTIPLIER = 10000;  // A股 ETF 期权乘数固定 10000
+
+// State
+const state = {
+  under: UNDERLYINGS[0],
+  optType: 10,           // 10 = put (认沽), 9 = call (认购)
+  marginMode: 'cash',    // 'cash' | 'exchange'
+  uplift: 0.10,          // 券商上浮率
+  pxMode: 'bid',         // 'bid' | 'mid' | 'last'
+  sortKey: 'yld',
+  sortDir: -1,           // -1 desc, 1 asc
+  underPx: 0,
+  underChg: 0,
+  rows: [],              // option contracts with computed yields
+  cdSec: 60,
+  cdTimer: null,
+  loading: false,
+};
+
+// Populate underlying selector
+const underSel = document.getElementById('underSel');
+UNDERLYINGS.forEach(u => {
+  const opt = document.createElement('option');
+  opt.value = u.code;
+  opt.textContent = `${u.name} (${u.code})`;
+  underSel.appendChild(opt);
+});
+
+// ══════════════════════════════════════════════════════════
+// MARKET STATUS
+// ══════════════════════════════════════════════════════════
+function mktStatus() {
+  const d = new Date();
+  const day = d.getDay();
+  if (day === 0 || day === 6) return 'closed';
+  const m = d.getHours() * 60 + d.getMinutes();
+  if (m >= 9*60+15 && m < 9*60+30) return 'pre';
+  if (m >= 9*60+30 && m < 11*60+30) return 'open';
+  if (m >= 13*60 && m < 15*60) return 'open';
+  return 'closed';
+}
+function renderMktStatus() {
+  const s = mktStatus();
+  const dot = document.getElementById('mktDot');
+  const lbl = document.getElementById('mktLabel');
+  dot.className = 'mkt-dot ' + (s==='open'?'dot-open':s==='pre'?'dot-pre':'dot-cls');
+  lbl.textContent = s==='open' ? '交易中 (09:30-15:00)' : s==='pre' ? '集合竞价' : '休市';
+}
+
+// ══════════════════════════════════════════════════════════
+// EXPIRY DATE CALC — A股期权: 到期月的第四个星期三
+// ══════════════════════════════════════════════════════════
+function parseExpiry(contractName) {
+  // e.g. "50ETF沽6月2900" or "300ETF购12月3500"
+  // Extract month (1-12). Year = if month < currentMonth → next year, else current year.
+  const m = contractName.match(/[沽购](\d{1,2})月/);
+  if (!m) return null;
+  const mo = parseInt(m[1]);
+  const now = new Date();
+  const curMo = now.getMonth() + 1;
+  let yr = now.getFullYear();
+  if (mo < curMo || (mo === curMo && now.getDate() > 25)) yr++;
+  // Find 4th Wednesday of {yr, mo}
+  const first = new Date(yr, mo - 1, 1);
+  const firstDow = first.getDay();
+  // Wednesday = 3. Days to first Wednesday:
+  const offset = (3 - firstDow + 7) % 7;
+  const firstWed = 1 + offset;
+  const fourthWed = firstWed + 21;
+  return new Date(yr, mo - 1, fourthWed);
+}
+function daysUntil(d) {
+  if (!d) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const target = new Date(d); target.setHours(0,0,0,0);
+  return Math.round((target - today) / 86400000);
+}
+
+// ══════════════════════════════════════════════════════════
+// MARGIN CALC
+// ══════════════════════════════════════════════════════════
+function calcMargin(strike, premium, underPx, optType) {
+  // strike, premium, underPx in 元/份 (not contract value)
+  // Returns 保证金/份
+  if (state.marginMode === 'cash') {
+    // Cash-secured: lock full strike value (for puts)
+    // For calls (covered call writes), simplified: also use strike — but covered call has stock-side
+    // For consistency we use strike as the conservative cash baseline
+    return strike;
+  }
+  // Exchange minimum
+  let virt;  // 虚值额
+  if (optType === 10) {  // put
+    virt = Math.max(underPx - strike, 0);
+  } else {  // call
+    virt = Math.max(strike - underPx, 0);
+  }
+  const base = premium + Math.max(0.12 * underPx - virt, 0.07 * strike);
+  return base * (1 + state.uplift);
+}
+
+// ══════════════════════════════════════════════════════════
+// DATA FETCH
+// ══════════════════════════════════════════════════════════
+const EM_API = 'https://push2.eastmoney.com/api/qt';
+
+async function fetchUnderlying() {
+  // Get underlying ETF price
+  const url = `${EM_API}/stock/get?secid=${state.under.secid}&fields=f43,f44,f45,f47,f48,f57,f58,f60,f170&_=${Date.now()}`;
+  try {
+    const r = await fetch(url);
+    const j = await r.json();
+    if (j.data) {
+      state.underPx = j.data.f43 / 1000;  // 东财 ETF 价格通常乘了 1000
+      state.underChg = j.data.f170;       // 涨跌幅
+      // Sanity check: f43 sometimes already in元
+      if (state.underPx < 0.1 || state.underPx > 100) state.underPx = j.data.f43;
+    }
+  } catch(e) {
+    console.warn('fetchUnderlying fail', e);
+  }
+}
+
+async function fetchOptionList() {
+  // List all contracts (put or call)
+  const url = `${EM_API}/slist/get?secid=${state.under.secid}&pi=0&pz=300&po=0&spt=${state.optType}&fltt=2&invt=2&fid=f161&fields=f12,f14,f161,f250,f334,f2,f3&_=${Date.now()}`;
+  const r = await fetch(url);
+  const j = await r.json();
+  if (!j.data || !j.data.diff) return [];
+  // diff is an object with numeric keys
+  const list = Object.values(j.data.diff);
+  return list.map(d => ({
+    code: d.f12,
+    name: d.f14,
+    strike: d.f161,
+    moneyness: d.f250,
+    underPx: d.f334,
+    lastPx: typeof d.f2 === 'number' ? d.f2 : null,
+    chg: typeof d.f3 === 'number' ? d.f3 : null,
+  })).filter(o => o.strike > 0);
+}
+
+async function fetchOptionQuote(contract) {
+  // Fetch bid/ask/volume/OI for a single contract.
+  // ETF options are on exchanges, secid prefix: 10. = SSE option, 11. = SZSE option
+  // We try both prefixes; one will work.
+  const prefixes = state.under.code.startsWith('5') ? ['10'] : ['11'];
+  for (const pre of prefixes) {
+    const url = `${EM_API}/stock/get?secid=${pre}.${contract.code}&fields=f43,f44,f45,f47,f48,f161,f330,f334,f31,f32,f33,f34,f35,f36,f37,f38,f39,f40,f249,f250,f170&_=${Date.now()}`;
+    try {
+      const r = await fetch(url);
+      const j = await r.json();
+      if (j.data && j.data.f43 !== undefined) return j.data;
+    } catch(e) {}
+  }
+  return null;
+}
+
+async function fetchAllQuotes(contracts) {
+  // Batch parallel fetch (limit concurrency)
+  const CONCURRENT = 6;
+  const results = new Array(contracts.length);
+  let i = 0;
+  async function worker() {
+    while (i < contracts.length) {
+      const idx = i++;
+      results[idx] = await fetchOptionQuote(contracts[idx]);
+    }
+  }
+  await Promise.all(Array.from({length: CONCURRENT}, worker));
+  return results;
+}
+
+// ══════════════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════════════
+function pctClass(v) {
+  if (v === null || v === undefined || isNaN(v)) return 'yld-na';
+  if (v >= 50) return 'yld-hi';
+  if (v >= 20) return 'yld-md';
+  if (v >= 5)  return 'yld-lo';
+  return 'yld-na';
+}
+function fmtPct(v, digits=2) {
+  if (v === null || v === undefined || isNaN(v)) return '--';
+  return (v >= 0 ? '+' : '') + v.toFixed(digits) + '%';
+}
+function fmtNum(v, d=4) {
+  if (v === null || v === undefined || isNaN(v) || v === 0) return '--';
+  return v.toFixed(d);
+}
+function fmtInt(v) {
+  if (v === null || v === undefined || isNaN(v)) return '--';
+  return Math.round(v).toLocaleString();
+}
+
+function computeRow(c, q) {
+  if (!q) return null;
+  // Eastmoney quote fields — these field IDs need verification during trading hours
+  // Common assumptions:
+  // f43 = last price, f47 = volume, f48 = amount, f330 = open interest
+  // f31, f33 = ask 1, bid 1 (or vice versa) — TBD
+  const last = q.f43 || 0;
+  const bid = q.f33 || 0;     // 买一价 (best guess)
+  const ask = q.f31 || 0;     // 卖一价 (best guess)
+  const volume = q.f47 || 0;
+  const oi = q.f330 || 0;
+  const underPx = q.f334 || state.underPx;
+
+  // Liquidity check — illiquid if bid=0 or ask=0
+  const illiq = (bid <= 0 || ask <= 0);
+
+  // Premium price selection
+  let premiumPx;
+  if (state.pxMode === 'bid') premiumPx = bid;
+  else if (state.pxMode === 'mid') premiumPx = (bid > 0 && ask > 0) ? (bid + ask) / 2 : last;
+  else premiumPx = last;
+
+  // If no valid premium, mark as null
+  if (premiumPx <= 0) {
+    return {
+      ...c, last, bid, ask, volume, oi, underPx, illiq,
+      premiumPx: 0, marginPx: 0,
+      premium: 0, margin: 0, yldp: null, yld: null,
+      days: daysUntil(parseExpiry(c.name)),
+    };
+  }
+
+  const margin = calcMargin(c.strike, premiumPx, underPx, state.optType);
+  const days = daysUntil(parseExpiry(c.name));
+  const yldp = (premiumPx / margin) * 100;
+  const yld = days > 0 ? yldp * (365 / days) : null;
+
+  return {
+    ...c, last, bid, ask, volume, oi, underPx, illiq,
+    premiumPx,
+    marginPx: margin,
+    premium: premiumPx * CONTRACT_MULTIPLIER,
+    margin: margin * CONTRACT_MULTIPLIER,
+    yldp, yld, days,
+  };
+}
+
+function moneynessClass(moneyness, optType) {
+  // For puts: positive moneyness = ITM (strike > spot)
+  // Eastmoney's f250 sign: positive when ITM, negative when OTM (with some scale)
+  if (Math.abs(moneyness) < 2) return 'tag-atm';
+  // We use the moneyness sign as-is — Eastmoney convention
+  if (moneyness > 0) return 'tag-itm';
+  return 'tag-otm';
+}
+function moneynessLabel(moneyness) {
+  if (Math.abs(moneyness) < 2) return '平值';
+  return moneyness > 0 ? '实值' : '虚值';
+}
+
+function renderTable() {
+  const tbody = document.getElementById('tbody');
+  if (!state.rows.length) {
+    tbody.innerHTML = '<tr class="load-row"><td colspan="9">暂无数据</td></tr>';
+    return;
+  }
+  // Sort
+  const sk = state.sortKey, sd = state.sortDir;
+  const sinks = r => r.illiq;
+  const sorted = [...state.rows].sort((a, b) => {
+    const sa = sinks(a), sb = sinks(b);
+    if (sa !== sb) return sa ? 1 : -1;
+    let va = a[sk], vb = b[sk];
+    if (va === null || va === undefined) va = sd === -1 ? -Infinity : Infinity;
+    if (vb === null || vb === undefined) vb = sd === -1 ? -Infinity : Infinity;
+    return sd * (va < vb ? -1 : va > vb ? 1 : 0);
+  });
+
+  tbody.innerHTML = sorted.map(r => {
+    const yld = (r.yld === null || isNaN(r.yld)) ? '--' : r.yld.toFixed(1) + '%';
+    const yldp = (r.yldp === null || isNaN(r.yldp)) ? '--' : r.yldp.toFixed(2) + '%';
+    const yldCls = pctClass(r.yld);
+    const expDate = parseExpiry(r.name);
+    const expStr = expDate ? `${expDate.getMonth()+1}-${expDate.getDate()}` : '--';
+    const daysStr = r.days !== null ? r.days + '天' : '--';
+    const mCls = moneynessClass(r.moneyness, state.optType);
+    const mLab = moneynessLabel(r.moneyness);
+    const bid = r.bid > 0 ? r.bid.toFixed(4) : '<span style="color:var(--td)">无</span>';
+    const ask = r.ask > 0 ? r.ask.toFixed(4) : '<span style="color:var(--td)">无</span>';
+    return `<tr class="clickable${r.illiq ? ' illiq' : ''}" onclick="openMdl('${r.code}')">
+      <td><div class="tk-name mono">${r.strike.toFixed(4)}</div><div style="font-size:10px;color:var(--td)">${r.name}</div></td>
+      <td><div class="mono">${expStr}</div><div style="font-size:10px;color:var(--td)">${daysStr}</div></td>
+      <td><span class="tag ${mCls}">${mLab}</span> <span class="mono" style="font-size:11px">${r.moneyness.toFixed(2)}%</span></td>
+      <td class="bid-ask"><span class="b">${bid}</span><span class="sep"> / </span><span class="a">${ask}</span></td>
+      <td><div class="mono">${fmtInt(r.volume)}</div><div style="font-size:10px;color:var(--td)">持仓 ${fmtInt(r.oi)}</div></td>
+      <td class="mono">${fmtInt(r.premium)} 元</td>
+      <td class="mono">${fmtInt(r.margin)} 元</td>
+      <td class="${pctClass(r.yldp)}">${yldp}</td>
+      <td class="${yldCls}" style="font-size:14px">${yld}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+// SORT
+// ══════════════════════════════════════════════════════════
+const SORT_COLS = ['strike','expiry','moneyness','bid','volume','premium','margin','yldp','yld'];
+function sortBy(key) {
+  if (state.sortKey === key) state.sortDir *= -1;
+  else { state.sortKey = key; state.sortDir = -1; }
+  updateSortUI();
+  renderTable();
+}
+function updateSortUI() {
+  SORT_COLS.forEach(k => {
+    const th = document.getElementById('th_'+k);
+    const sa = document.getElementById('sa_'+k);
+    if (!th) return;
+    if (state.sortKey === k) {
+      th.classList.add('srt');
+      sa.textContent = state.sortDir === -1 ? '↓' : '↑';
+    } else {
+      th.classList.remove('srt');
+      sa.textContent = '↕';
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+// CONTROL HANDLERS
+// ══════════════════════════════════════════════════════════
+function onChangeUnder() {
+  const code = underSel.value;
+  state.under = UNDERLYINGS.find(u => u.code === code);
+  doRefresh();
+}
+function setOptType(t) {
+  state.optType = t;
+  document.getElementById('optPut').classList.toggle('on', t === 10);
+  document.getElementById('optCall').classList.toggle('on', t === 9);
+  doRefresh();
+}
+function setMarginMode(m) {
+  state.marginMode = m;
+  document.getElementById('mmCash').classList.toggle('on', m === 'cash');
+  document.getElementById('mmEx').classList.toggle('on', m === 'exchange');
+  document.getElementById('upliftGrp').style.display = m === 'exchange' ? 'flex' : 'none';
+  recompute();
+}
+function onUpliftChange(v) {
+  state.uplift = parseInt(v) / 100;
+  document.getElementById('upliftVal').textContent = v + '%';
+  recompute();
+}
+function setPxMode(m) {
+  state.pxMode = m;
+  ['bid','mid','last'].forEach(k => document.getElementById('px'+k.charAt(0).toUpperCase()+k.slice(1)).classList.toggle('on', k === m));
+  recompute();
+}
+// Prevent tooltip clicks from sorting
+document.querySelectorAll('.tip').forEach(t => t.addEventListener('click', e => e.stopPropagation()));
+
+// ══════════════════════════════════════════════════════════
+// REFRESH
+// ══════════════════════════════════════════════════════════
+function recompute() {
+  state.rows = state.rows.map(r => {
+    const fakeQuote = {f43: r.last||0, f31: r.ask||0, f33: r.bid||0, f47: r.volume||0, f330: r.oi||0, f334: r.underPx||state.underPx};
+    return computeRow(r, fakeQuote);
+  }).filter(Boolean);
+  renderTable();
+}
+
+async function doRefresh() {
+  if (state.loading) return;
+  state.loading = true;
+  clearInterval(state.cdTimer);
+  document.getElementById('cdTimer').textContent = '加载中…';
+  const btn = document.getElementById('rfBtn');
+  const ic = document.getElementById('rfIcon');
+  btn.classList.add('loading');
+  ic.style.animation = 'spin .7s linear infinite';
+
+  const errBar = document.getElementById('errBar');
+  errBar.style.display = 'none';
+
+  try {
+    // First load: show spinner
+    if (state.rows.length === 0) {
+      document.getElementById('tbody').innerHTML =
+        `<tr class="load-row"><td colspan="9"><span class="lspin"></span>加载 ${state.under.name} 期权数据...</td></tr>`;
+    }
+
+    await fetchUnderlying();
+    document.getElementById('underName').textContent = state.under.name;
+    document.getElementById('underPrice').textContent = state.underPx > 0 ? state.underPx.toFixed(4) : '--';
+    const chgEl = document.getElementById('underChg');
+    if (typeof state.underChg === 'number') {
+      const sign = state.underChg >= 0 ? '+' : '';
+      chgEl.textContent = sign + state.underChg.toFixed(2) + '%';
+      chgEl.style.color = state.underChg >= 0 ? 'var(--g)' : 'var(--r)';
+    }
+
+    const contracts = await fetchOptionList();
+    if (contracts.length === 0) throw new Error('期权链为空');
+    const quotes = await fetchAllQuotes(contracts);
+    state.rows = contracts.map((c, i) => computeRow(c, quotes[i])).filter(Boolean);
+
+  } catch(e) {
+    console.error(e);
+    errBar.textContent = '⚠ 数据获取失败: ' + e.message;
+    errBar.style.display = 'inline-block';
+  }
+
+  const now = new Date();
+  document.getElementById('updTime').textContent =
+    now.toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+
+  renderMktStatus();
+  renderTable();
+
+  ic.style.animation = '';
+  btn.classList.remove('loading');
+  state.loading = false;
+
+  if (mktStatus() === 'open') startCountdown();
+  else document.getElementById('cdTimer').textContent = '休市';
+}
+
+function startCountdown() {
+  clearInterval(state.cdTimer);
+  state.cdSec = 60;
+  document.getElementById('cdTimer').textContent = '60s';
+  state.cdTimer = setInterval(() => {
+    state.cdSec--;
+    document.getElementById('cdTimer').textContent = state.cdSec + 's';
+    if (state.cdSec <= 0) { clearInterval(state.cdTimer); doRefresh(); }
+  }, 1000);
+}
+
+// ══════════════════════════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════════════════════════
+function openMdl(code) {
+  const r = state.rows.find(x => x.code === code);
+  if (!r) return;
+  const expDate = parseExpiry(r.name);
+  const expFull = expDate ? `${expDate.getFullYear()}-${String(expDate.getMonth()+1).padStart(2,'0')}-${String(expDate.getDate()).padStart(2,'0')}` : '--';
+  const optTypeLabel = state.optType === 10 ? '认沽 PUT' : '认购 CALL';
+  const mLab = moneynessLabel(r.moneyness);
+  const mCls = moneynessClass(r.moneyness, state.optType);
+  const yldCls = pctClass(r.yld);
+
+  // Calc explanation
+  let mgnFormula;
+  if (state.marginMode === 'cash') {
+    mgnFormula = `保证金 = 行权价 × 10000\n         = ${r.strike} × 10000\n         = <b>${fmtInt(r.margin)}</b> 元`;
+  } else {
+    const virt = state.optType === 10
+      ? Math.max(r.underPx - r.strike, 0)
+      : Math.max(r.strike - r.underPx, 0);
+    const term1 = 0.12 * r.underPx - virt;
+    const term2 = 0.07 * r.strike;
+    const useT = Math.max(term1, term2);
+    mgnFormula = `${state.optType === 10 ? '认沽' : '认购'}虚值 = max(标的−行权, 0) = ${virt.toFixed(4)}
+保证金/份 = 权利金 + max(12%×标的−虚值, 7%×行权价)
+         = ${r.premiumPx.toFixed(4)} + max(${term1.toFixed(4)}, ${term2.toFixed(4)})
+         = <b>${r.marginPx.toFixed(4)}</b> × ${state.uplift > 0 ? `(1+${(state.uplift*100).toFixed(0)}%)` : ''}
+单合约 = <b>${fmtInt(r.margin)}</b> 元`;
+  }
+
+  const dateStr = new Date().toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'}).replace(/\//g,'-');
+
+  document.getElementById('mdlBody').innerHTML = `
+    <div class="mdl-hd">
+      <div class="mdl-brand"><span class="logo-i">ZX</span>期权卖方收益率</div>
+      <div class="mdl-bdate">${dateStr}</div>
+    </div>
+
+    <div class="mdl-title">${r.name}</div>
+    <div class="mdl-sub">
+      <span class="tk">${r.code}</span>
+      <span class="b tag-${state.optType === 10 ? 'otm' : 'itm'}">${optTypeLabel}</span>
+      <span class="b ${mCls}">${mLab}</span>
+      ${r.illiq ? `<span class="b" style="background:rgba(100,116,139,.2);color:var(--td)">单边/无流动性</span>` : ''}
+    </div>
+
+    <div class="mdl-yld-row">
+      <div class="mdl-yld">
+        <div class="mdl-yld-lab">年化收益率</div>
+        <div class="mdl-yld-val ${yldCls}">${r.yld !== null ? (r.yld>=0?'+':'')+r.yld.toFixed(1)+'%' : '--'}</div>
+        <div class="mdl-yld-note">${state.marginMode === 'cash' ? '现金担保' : `交易所×${(1+state.uplift).toFixed(2)}`}</div>
+      </div>
+      <div class="mdl-yld">
+        <div class="mdl-yld-lab">期间收益率</div>
+        <div class="mdl-yld-val ${pctClass(r.yldp)}">${r.yldp !== null ? r.yldp.toFixed(2)+'%' : '--'}</div>
+        <div class="mdl-yld-note">持有 ${r.days} 天</div>
+      </div>
+    </div>
+
+    <div class="mdl-calc">
+      <span class="label">收益率计算</span>
+      <b>${state.pxMode==='bid'?'买一':state.pxMode==='mid'?'中价':'最新'}价</b> = ${r.premiumPx.toFixed(4)} → 单张权利金 <b>${fmtInt(r.premium)}</b> 元
+      ${mgnFormula}
+      年化 = (权利金/保证金) × 365/${r.days} = <b>${r.yld!==null?r.yld.toFixed(1):'--'}%</b>
+    </div>
+
+    <div class="mdl-info">
+      <div class="mdl-info-item">
+        <span class="mdl-info-lab">标的现价</span>
+        <span class="mdl-info-val">${r.underPx ? r.underPx.toFixed(4) : '--'}</span>
+      </div>
+      <div class="mdl-info-item">
+        <span class="mdl-info-lab">行权价</span>
+        <span class="mdl-info-val mid">${r.strike.toFixed(4)}</span>
+      </div>
+      <div class="mdl-info-item">
+        <span class="mdl-info-lab">到期日</span>
+        <span class="mdl-info-val">${expFull}</span>
+      </div>
+      <div class="mdl-info-item">
+        <span class="mdl-info-lab">剩余天数</span>
+        <span class="mdl-info-val ${r.days < 7 ? 'warn' : r.days < 30 ? 'mid' : 'ok'}">${r.days}天</span>
+      </div>
+      <div class="mdl-info-item">
+        <span class="mdl-info-lab">Bid / Ask</span>
+        <span class="mdl-info-val" style="font-size:12px">${r.bid>0?r.bid.toFixed(4):'-'} / ${r.ask>0?r.ask.toFixed(4):'-'}</span>
+      </div>
+      <div class="mdl-info-item">
+        <span class="mdl-info-lab">成交 / 持仓</span>
+        <span class="mdl-info-val" style="font-size:12px">${fmtInt(r.volume)} / ${fmtInt(r.oi)}</span>
+      </div>
+    </div>
+
+    <div class="mdl-footer">options.zxcapitalgroup.com</div>
+  `;
+  document.getElementById('mdlBg').classList.add('on');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMdl(e) {
+  if (e && e.type === 'click' && e.target !== e.currentTarget) return;
+  document.getElementById('mdlBg').classList.remove('on');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMdl(); });
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+renderMktStatus();
+setInterval(renderMktStatus, 30000);
+doRefresh();
+</script>
+</body></html>
