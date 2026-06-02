@@ -257,13 +257,14 @@ footer{border-top:1px solid var(--bdr);padding:30px 20px 22px;background:var(--b
     <th onclick="sortBy('moneyness')" id="th_moneyness">价内/外%<span class="tip" data-tip="认沽期权:&#10;价内 (ITM): 行权价 > 标的价 → 大概率被行权&#10;平值 (ATM): 行权价 ≈ 标的价&#10;价外 (OTM): 行权价 < 标的价 → 大概率不被行权">ⓘ</span><span class="sarr" id="sa_moneyness">↕</span></th>
     <th onclick="sortBy('bid')" id="th_bid">买卖价 Bid / Ask<span class="tip" data-tip="买一价(Bid) = 当前买家愿出的最高价&#10;卖一价(Ask) = 当前卖家挂的最低价&#10;卖出期权时:&#10;• 市价单 = 在 Bid 成交&#10;• 挂 Ask = 等买家来吃">ⓘ</span><span class="sarr" id="sa_bid">↕</span></th>
     <th onclick="sortBy('volume')" id="th_volume">成交 / 持仓<span class="tip" data-tip="成交量: 当日累计成交张数&#10;持仓量: 未平仓张数(open interest)&#10;持仓量大 = 流动性好,买卖价差小">ⓘ</span><span class="sarr" id="sa_volume">↕</span></th>
+    <th onclick="sortBy('iv')" id="th_iv">隐含波动率 IV<span class="tip" data-tip="Implied Volatility, 由 Black-Scholes 公式从期权价反推&#10;表示市场预期的标的年化波动率&#10;&#10;• IV 高 → 期权贵 → 卖方收益率高&#10;• IV 低 → 期权便宜 → 卖方收益率低&#10;&#10;基准: 1年期国债利率 1.8%&#10;用中价 (bid+ask)/2 反推, 消除价差噪音">ⓘ</span><span class="sarr" id="sa_iv">↕</span></th>
     <th onclick="sortBy('premium')" id="th_premium">权利金/张<span class="tip" data-tip="卖出 1 张合约能拿到的权利金 (元)&#10;= 期权价 × 合约乘数(10000)">ⓘ</span><span class="sarr" id="sa_premium">↕</span></th>
     <th onclick="sortBy('margin')" id="th_margin">保证金/张<span class="tip" data-tip="卖出 1 张合约占用的保证金&#10;现金担保 = 行权价 × 10000&#10;交易所最低 = (权利金 + max(12% × 标的现价 − 虚值额, 7% × 行权价)) × 10000&#10;再乘 (1 + 上浮率)">ⓘ</span><span class="sarr" id="sa_margin">↕</span></th>
     <th onclick="sortBy('yldp')" id="th_yldp">期间 yield<span class="tip" data-tip="= 权利金 ÷ 保证金 × 100%&#10;持有到期能拿到的净收益率">ⓘ</span><span class="sarr" id="sa_yldp">↕</span></th>
     <th onclick="sortBy('yld')" id="th_yld" class="srt">年化 yield<span class="tip" data-tip="= 期间收益率 × (365 / 剩余天数)&#10;主排序字段,默认降序&#10;灰色 = 单边报价/无流动性,数据不可信">ⓘ</span><span class="sarr" id="sa_yld">↓</span></th>
   </tr></thead>
   <tbody id="tbody">
-    <tr class="load-row"><td colspan="9"><span class="lspin"></span>加载期权数据...</td></tr>
+    <tr class="load-row"><td colspan="10"><span class="lspin"></span>加载期权数据...</td></tr>
   </tbody>
 </table></div>
 
@@ -330,6 +331,55 @@ const UNDERLYINGS = [
   {code:'159922', secid:'0.159922', name:'中证500ETF嘉实',     short:'500ETF深'},
 ];
 const CONTRACT_MULTIPLIER = 10000;  // A股 ETF 期权乘数固定 10000
+const RISK_FREE_RATE = 0.018;       // 1年期国债收益率近似, 用于 IV 计算
+
+// ══════════════════════════════════════════════════════════
+// BLACK-SCHOLES & IMPLIED VOLATILITY
+// ──────────────────────────────────────────────────────────
+// A股 ETF 期权是欧式期权, BS 公式直接适用
+// ══════════════════════════════════════════════════════════
+// 标准正态累积分布函数 (Abramowitz & Stegun approx, 误差 < 7.5e-8)
+function normCDF(x) {
+  const a1 =  0.254829592, a2 = -0.284496736, a3 =  1.421413741;
+  const a4 = -1.453152027, a5 =  1.061405429, p  =  0.3275911;
+  const sign = x < 0 ? -1 : 1;
+  x = Math.abs(x) / Math.sqrt(2);
+  const t = 1 / (1 + p * x);
+  const y = 1 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1) * t * Math.exp(-x*x);
+  return 0.5 * (1 + sign * y);
+}
+
+// BS 理论价: S=标的, K=行权, T=年化时间, r=无风险利率, sigma=波动率, isPut=认沽
+function bsPrice(S, K, T, r, sigma, isPut) {
+  if (T <= 0 || sigma <= 0) {
+    return isPut ? Math.max(K - S, 0) : Math.max(S - K, 0);
+  }
+  const sqrtT = Math.sqrt(T);
+  const d1 = (Math.log(S/K) + (r + sigma*sigma/2) * T) / (sigma * sqrtT);
+  const d2 = d1 - sigma * sqrtT;
+  if (isPut) {
+    return K * Math.exp(-r*T) * normCDF(-d2) - S * normCDF(-d1);
+  }
+  return S * normCDF(d1) - K * Math.exp(-r*T) * normCDF(d2);
+}
+
+// 二分法求 IV. 失败返回 null.
+function calcIV(marketPrice, S, K, T, r, isPut) {
+  if (!(marketPrice > 0 && S > 0 && K > 0 && T > 0)) return null;
+  // 内在价值下限
+  const intrinsic = isPut ? Math.max(K - S, 0) : Math.max(S - K, 0);
+  if (marketPrice < intrinsic - 0.001) return null;  // 价格低于内在价值 = 数据异常
+  let lo = 0.001, hi = 5.0;
+  for (let i = 0; i < 60; i++) {
+    const mid = (lo + hi) / 2;
+    const price = bsPrice(S, K, T, r, mid, isPut);
+    if (Math.abs(price - marketPrice) < 1e-5) return mid;
+    if (price < marketPrice) lo = mid; else hi = mid;
+  }
+  const result = (lo + hi) / 2;
+  if (result < 0.005 || result > 4.99) return null;  // 边界值不可信
+  return result;
+}
 
 // State
 const state = {
@@ -562,13 +612,22 @@ function computeRow(c, q) {
   const yldp = (premiumPx / margin) * 100;
   const yld = days > 0 ? yldp * (365 / days) : null;
 
+  // IV 计算: 用中价 (bid+ask)/2 反推, 中价能消除买卖价差噪音
+  // 如果只有一边报价, 退而用 last
+  let ivPx = null;
+  if (bid > 0 && ask > 0) ivPx = (bid + ask) / 2;
+  else if (last > 0) ivPx = last;
+  const iv = (ivPx && days > 0 && underPx > 0)
+    ? calcIV(ivPx, underPx, c.strike, days / 365, RISK_FREE_RATE, state.optType === 10)
+    : null;
+
   return {
     ...c, last, bid, ask, volume, oi, underPx, illiq,
     premiumPx,
     marginPx: margin,
     premium: premiumPx * CONTRACT_MULTIPLIER,
     margin: margin * CONTRACT_MULTIPLIER,
-    yldp, yld, days,
+    yldp, yld, days, iv,
   };
 }
 
@@ -588,7 +647,7 @@ function moneynessLabel(moneyness) {
 function renderTable() {
   const tbody = document.getElementById('tbody');
   if (!state.rows.length) {
-    tbody.innerHTML = '<tr class="load-row"><td colspan="9">暂无数据</td></tr>';
+    tbody.innerHTML = '<tr class="load-row"><td colspan="10">暂无数据</td></tr>';
     return;
   }
   // Sort
@@ -620,6 +679,7 @@ function renderTable() {
       <td><span class="tag ${mCls}">${mLab}</span> <span class="mono" style="font-size:11px">${r.moneyness.toFixed(2)}%</span></td>
       <td class="bid-ask"><span class="b">${bid}</span><span class="sep"> / </span><span class="a">${ask}</span></td>
       <td><div class="mono">${fmtInt(r.volume)}</div><div style="font-size:10px;color:var(--td)">持仓 ${fmtInt(r.oi)}</div></td>
+      <td class="mono">${r.iv !== null ? (r.iv * 100).toFixed(1) + '%' : '<span class="yld-na">--</span>'}</td>
       <td class="mono">${fmtInt(r.premium)} 元</td>
       <td class="mono">${fmtInt(r.margin)} 元</td>
       <td class="${pctClass(r.yldp)}">${yldp}</td>
@@ -631,7 +691,7 @@ function renderTable() {
 // ══════════════════════════════════════════════════════════
 // SORT
 // ══════════════════════════════════════════════════════════
-const SORT_COLS = ['strike','expiry','moneyness','bid','volume','premium','margin','yldp','yld'];
+const SORT_COLS = ['strike','expiry','moneyness','bid','volume','iv','premium','margin','yldp','yld'];
 function sortBy(key) {
   if (state.sortKey === key) state.sortDir *= -1;
   else { state.sortKey = key; state.sortDir = -1; }
@@ -715,7 +775,7 @@ async function doRefresh() {
     // First load: show spinner
     if (state.rows.length === 0) {
       document.getElementById('tbody').innerHTML =
-        `<tr class="load-row"><td colspan="9"><span class="lspin"></span>加载 ${state.under.name} 期权数据...</td></tr>`;
+        `<tr class="load-row"><td colspan="10"><span class="lspin"></span>加载 ${state.under.name} 期权数据...</td></tr>`;
     }
 
     await fetchUnderlying();
@@ -856,6 +916,14 @@ function openMdl(code) {
       <div class="mdl-info-item">
         <span class="mdl-info-lab">成交 / 持仓</span>
         <span class="mdl-info-val" style="font-size:12px">${fmtInt(r.volume)} / ${fmtInt(r.oi)}</span>
+      </div>
+      <div class="mdl-info-item">
+        <span class="mdl-info-lab">隐含波动率 IV</span>
+        <span class="mdl-info-val ${r.iv === null ? '' : r.iv > 0.30 ? 'warn' : r.iv > 0.20 ? 'mid' : 'ok'}">${r.iv !== null ? (r.iv*100).toFixed(1) + '%' : '--'}</span>
+      </div>
+      <div class="mdl-info-item">
+        <span class="mdl-info-lab">无风险利率</span>
+        <span class="mdl-info-val" style="font-size:12px">${(RISK_FREE_RATE*100).toFixed(1)}%</span>
       </div>
     </div>
 
