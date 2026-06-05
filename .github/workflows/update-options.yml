@@ -1,0 +1,49 @@
+name: Update Options Data
+
+on:
+  schedule:
+    # Beijing time (UTC+8) → cron in UTC
+    # A-share trading hours: 09:30-11:30 + 13:00-15:00 CST
+    - cron: '35 1 * * 1-5'    # 09:35 CST  开盘5分钟刷
+    - cron: '0 3 * * 1-5'     # 11:00 CST  上午中段
+    - cron: '20 3 * * 1-5'    # 11:20 CST  上午近尾
+    - cron: '15 5 * * 1-5'    # 13:15 CST  下午开盘
+    - cron: '0 6 * * 1-5'     # 14:00 CST  下午中段
+    - cron: '50 6 * * 1-5'    # 14:50 CST  收盘前
+    - cron: '5 7 * * 1-5'     # 15:05 CST  收盘后定稿
+  workflow_dispatch:           # manual trigger
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-options
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run scraper
+        env:
+          PYTHONIOENCODING: utf-8
+        run: python scripts/update_options.py
+
+      - name: Commit & push if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --quiet --staged; then
+            echo "No changes."
+          else
+            git commit -m "data: refresh options ($(TZ=Asia/Shanghai date +%Y-%m-%dT%H:%M%z))"
+            git push
+          fi

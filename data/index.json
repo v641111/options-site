@@ -1,0 +1,194 @@
+{
+  "updated": "2026-06-05T12:17:01+08:00",
+  "underlyings": [
+    {
+      "code": "510050",
+      "name": "上证50ETF华夏",
+      "short": "50ETF",
+      "secid": "1.510050",
+      "spot": {
+        "price": 2.974,
+        "prevClose": 2.964,
+        "open": 2.958,
+        "high": 2.985,
+        "low": 2.952,
+        "name": "上证50ETF华夏"
+      },
+      "counts": {
+        "total": 118,
+        "calls": 59,
+        "puts": 59,
+        "iv_computed": 107,
+        "illiquid": 0
+      }
+    },
+    {
+      "code": "510300",
+      "name": "沪深300ETF华泰柏瑞",
+      "short": "300ETF沪",
+      "secid": "1.510300",
+      "spot": {
+        "price": 4.924,
+        "prevClose": 4.926,
+        "open": 4.909,
+        "high": 4.948,
+        "low": 4.89,
+        "name": "沪深300ETF华泰柏瑞"
+      },
+      "counts": {
+        "total": 126,
+        "calls": 63,
+        "puts": 63,
+        "iv_computed": 108,
+        "illiquid": 0
+      }
+    },
+    {
+      "code": "510500",
+      "name": "中证500ETF南方",
+      "short": "500ETF沪",
+      "secid": "1.510500",
+      "spot": {
+        "price": 8.458,
+        "prevClose": 8.448,
+        "open": 8.415,
+        "high": 8.5,
+        "low": 8.32,
+        "name": "中证500ETF南方"
+      },
+      "counts": {
+        "total": 136,
+        "calls": 68,
+        "puts": 68,
+        "iv_computed": 111,
+        "illiquid": 0
+      }
+    },
+    {
+      "code": "588000",
+      "name": "科创50ETF华夏",
+      "short": "科创50华夏",
+      "secid": "1.588000",
+      "spot": {
+        "price": 1.804,
+        "prevClose": 1.832,
+        "open": 1.801,
+        "high": 1.829,
+        "low": 1.778,
+        "name": "科创50ETF华夏"
+      },
+      "counts": {
+        "total": 156,
+        "calls": 78,
+        "puts": 78,
+        "iv_computed": 133,
+        "illiquid": 0
+      }
+    },
+    {
+      "code": "588080",
+      "name": "科创50ETF易方达",
+      "short": "科创50易",
+      "secid": "1.588080",
+      "spot": {
+        "price": 1.749,
+        "prevClose": 1.776,
+        "open": 1.743,
+        "high": 1.772,
+        "low": 1.722,
+        "name": "科创50ETF易方达"
+      },
+      "counts": {
+        "total": 152,
+        "calls": 76,
+        "puts": 76,
+        "iv_computed": 130,
+        "illiquid": 0
+      }
+    },
+    {
+      "code": "159901",
+      "name": "深证100ETF易方达",
+      "short": "深100ETF",
+      "secid": "0.159901",
+      "spot": {
+        "price": 4.071,
+        "prevClose": 4.088,
+        "open": 4.078,
+        "high": 4.108,
+        "low": 4.044,
+        "name": "深100ETF"
+      },
+      "counts": {
+        "total": 132,
+        "calls": 66,
+        "puts": 66,
+        "iv_computed": 99,
+        "illiquid": 22
+      }
+    },
+    {
+      "code": "159915",
+      "name": "创业板ETF易方达",
+      "short": "创业板ETF",
+      "secid": "0.159915",
+      "spot": {
+        "price": 4.07,
+        "prevClose": 4.1,
+        "open": 4.083,
+        "high": 4.122,
+        "low": 4.04,
+        "name": "创业板"
+      },
+      "counts": {
+        "total": 130,
+        "calls": 65,
+        "puts": 65,
+        "iv_computed": 111,
+        "illiquid": 0
+      }
+    },
+    {
+      "code": "159919",
+      "name": "沪深300ETF嘉实",
+      "short": "300ETF深",
+      "secid": "0.159919",
+      "spot": {
+        "price": 5.127,
+        "prevClose": 5.136,
+        "open": 5.115,
+        "high": 5.157,
+        "low": 5.097,
+        "name": "沪深300"
+      },
+      "counts": {
+        "total": 120,
+        "calls": 60,
+        "puts": 60,
+        "iv_computed": 96,
+        "illiquid": 5
+      }
+    },
+    {
+      "code": "159922",
+      "name": "中证500ETF嘉实",
+      "short": "500ETF深",
+      "secid": "0.159922",
+      "spot": {
+        "price": 3.36,
+        "prevClose": 3.363,
+        "open": 3.343,
+        "high": 3.381,
+        "low": 3.31,
+        "name": "500ETF"
+      },
+      "counts": {
+        "total": 140,
+        "calls": 70,
+        "puts": 70,
+        "iv_computed": 113,
+        "illiquid": 11
+      }
+    }
+  ]
+}

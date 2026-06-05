@@ -218,8 +218,8 @@ footer{border-top:1px solid var(--bdr);padding:30px 20px 22px;background:var(--b
   <div class="ctrl-grp">
     <span class="ctrl-lab">类型</span>
     <div class="cgroup">
-      <button class="cbtn on" id="optPut"  onclick="setOptType(10)">认沽 (Put)</button>
-      <button class="cbtn"    id="optCall" onclick="setOptType(9)">认购 (Call)</button>
+      <button class="cbtn on" id="optPut"  onclick="setOptType('P')">认沽 (Put)</button>
+      <button class="cbtn"    id="optCall" onclick="setOptType('C')">认购 (Call)</button>
     </div>
   </div>
   <div class="ctrl-grp">
@@ -320,91 +320,43 @@ footer{border-top:1px solid var(--bdr);padding:30px 20px 22px;background:var(--b
 // CONFIG
 // ══════════════════════════════════════════════════════════
 const UNDERLYINGS = [
-  {code:'510050', secid:'1.510050', name:'上证50ETF华夏',     short:'50ETF'},
-  {code:'510300', secid:'1.510300', name:'沪深300ETF华泰柏瑞', short:'300ETF沪'},
-  {code:'510500', secid:'1.510500', name:'中证500ETF南方',     short:'500ETF沪'},
-  {code:'588000', secid:'1.588000', name:'科创50ETF华夏',      short:'科创50华夏'},
-  {code:'588080', secid:'1.588080', name:'科创50ETF易方达',    short:'科创50易'},
-  {code:'159901', secid:'0.159901', name:'深证100ETF易方达',   short:'深100ETF'},
-  {code:'159915', secid:'0.159915', name:'创业板ETF易方达',    short:'创业板ETF'},
-  {code:'159919', secid:'0.159919', name:'沪深300ETF嘉实',     short:'300ETF深'},
-  {code:'159922', secid:'0.159922', name:'中证500ETF嘉实',     short:'500ETF深'},
+  {code:'510050', secid:'1.510050', name:'上证50ETF华夏',      short:'50ETF'},
+  {code:'510300', secid:'1.510300', name:'沪深300ETF华泰柏瑞',  short:'300ETF沪'},
+  {code:'510500', secid:'1.510500', name:'中证500ETF南方',      short:'500ETF沪'},
+  {code:'588000', secid:'1.588000', name:'科创50ETF华夏',       short:'科创50华夏'},
+  {code:'588080', secid:'1.588080', name:'科创50ETF易方达',     short:'科创50易'},
+  {code:'159901', secid:'0.159901', name:'深证100ETF易方达',    short:'深100ETF'},
+  {code:'159915', secid:'0.159915', name:'创业板ETF易方达',      short:'创业板ETF'},
+  {code:'159919', secid:'0.159919', name:'沪深300ETF嘉实',      short:'300ETF深'},
+  {code:'159922', secid:'0.159922', name:'中证500ETF嘉实',      short:'500ETF深'},
 ];
-const CONTRACT_MULTIPLIER = 10000;  // A股 ETF 期权乘数固定 10000
-const RISK_FREE_RATE = 0.018;       // 1年期国债收益率近似, 用于 IV 计算
+const CONTRACT_MULTIPLIER = 10000;
 
-// ══════════════════════════════════════════════════════════
-// BLACK-SCHOLES & IMPLIED VOLATILITY
-// ──────────────────────────────────────────────────────────
-// A股 ETF 期权是欧式期权, BS 公式直接适用
-// ══════════════════════════════════════════════════════════
-// 标准正态累积分布函数 (Abramowitz & Stegun approx, 误差 < 7.5e-8)
-function normCDF(x) {
-  const a1 =  0.254829592, a2 = -0.284496736, a3 =  1.421413741;
-  const a4 = -1.453152027, a5 =  1.061405429, p  =  0.3275911;
-  const sign = x < 0 ? -1 : 1;
-  x = Math.abs(x) / Math.sqrt(2);
-  const t = 1 / (1 + p * x);
-  const y = 1 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1) * t * Math.exp(-x*x);
-  return 0.5 * (1 + sign * y);
-}
-
-// BS 理论价: S=标的, K=行权, T=年化时间, r=无风险利率, sigma=波动率, isPut=认沽
-function bsPrice(S, K, T, r, sigma, isPut) {
-  if (T <= 0 || sigma <= 0) {
-    return isPut ? Math.max(K - S, 0) : Math.max(S - K, 0);
-  }
-  const sqrtT = Math.sqrt(T);
-  const d1 = (Math.log(S/K) + (r + sigma*sigma/2) * T) / (sigma * sqrtT);
-  const d2 = d1 - sigma * sqrtT;
-  if (isPut) {
-    return K * Math.exp(-r*T) * normCDF(-d2) - S * normCDF(-d1);
-  }
-  return S * normCDF(d1) - K * Math.exp(-r*T) * normCDF(d2);
-}
-
-// 二分法求 IV. 失败返回 null.
-function calcIV(marketPrice, S, K, T, r, isPut) {
-  if (!(marketPrice > 0 && S > 0 && K > 0 && T > 0)) return null;
-  // 内在价值下限
-  const intrinsic = isPut ? Math.max(K - S, 0) : Math.max(S - K, 0);
-  if (marketPrice < intrinsic - 0.001) return null;  // 价格低于内在价值 = 数据异常
-  let lo = 0.001, hi = 5.0;
-  for (let i = 0; i < 60; i++) {
-    const mid = (lo + hi) / 2;
-    const price = bsPrice(S, K, T, r, mid, isPut);
-    if (Math.abs(price - marketPrice) < 1e-5) return mid;
-    if (price < marketPrice) lo = mid; else hi = mid;
-  }
-  const result = (lo + hi) / 2;
-  if (result < 0.005 || result > 4.99) return null;  // 边界值不可信
-  return result;
-}
-
-// State
 const state = {
   under: UNDERLYINGS[0],
-  optType: 10,           // 10 = put (认沽), 9 = call (认购)
-  marginMode: 'cash',    // 'cash' | 'exchange'
-  uplift: 0.10,          // 券商上浮率
-  pxMode: 'bid',         // 'bid' | 'mid' | 'last'
+  optType: 'P',          // 'P' = put, 'C' = call
+  marginMode: 'cash',
+  uplift: 0.10,
+  pxMode: 'bid',
   sortKey: 'yld',
-  sortDir: -1,           // -1 desc, 1 asc
+  sortDir: -1,
   underPx: 0,
   underChg: 0,
-  rows: [],              // option contracts with computed yields
+  underName: '',
+  dataUpdated: '',
+  rawContracts: [],      // 全部合约 (含 calls + puts) 原始 JSON
+  rows: [],              // 经过 computeRow 计算后, 当前 type 过滤后的行
   cdSec: 60,
   cdTimer: null,
   loading: false,
 };
 
-// Populate underlying selector
 const underSel = document.getElementById('underSel');
 UNDERLYINGS.forEach(u => {
-  const opt = document.createElement('option');
-  opt.value = u.code;
-  opt.textContent = `${u.name} (${u.code})`;
-  underSel.appendChild(opt);
+  const o = document.createElement('option');
+  o.value = u.code;
+  o.textContent = `${u.name} (${u.code})`;
+  underSel.appendChild(o);
 });
 
 // ══════════════════════════════════════════════════════════
@@ -412,8 +364,8 @@ UNDERLYINGS.forEach(u => {
 // ══════════════════════════════════════════════════════════
 function mktStatus() {
   const d = new Date();
-  const day = d.getDay();
-  if (day === 0 || day === 6) return 'closed';
+  const dy = d.getDay();
+  if (dy === 0 || dy === 6) return 'closed';
   const m = d.getHours() * 60 + d.getMinutes();
   if (m >= 9*60+15 && m < 9*60+30) return 'pre';
   if (m >= 9*60+30 && m < 11*60+30) return 'open';
@@ -429,127 +381,48 @@ function renderMktStatus() {
 }
 
 // ══════════════════════════════════════════════════════════
-// EXPIRY DATE CALC — A股期权: 到期月的第四个星期三
-// ══════════════════════════════════════════════════════════
-function parseExpiry(contractName) {
-  // e.g. "50ETF沽6月2900" or "300ETF购12月3500"
-  // Extract month (1-12). Year = if month < currentMonth → next year, else current year.
-  const m = contractName.match(/[沽购](\d{1,2})月/);
-  if (!m) return null;
-  const mo = parseInt(m[1]);
-  const now = new Date();
-  const curMo = now.getMonth() + 1;
-  let yr = now.getFullYear();
-  if (mo < curMo || (mo === curMo && now.getDate() > 25)) yr++;
-  // Find 4th Wednesday of {yr, mo}
-  const first = new Date(yr, mo - 1, 1);
-  const firstDow = first.getDay();
-  // Wednesday = 3. Days to first Wednesday:
-  const offset = (3 - firstDow + 7) % 7;
-  const firstWed = 1 + offset;
-  const fourthWed = firstWed + 21;
-  return new Date(yr, mo - 1, fourthWed);
-}
-function daysUntil(d) {
-  if (!d) return null;
-  const today = new Date(); today.setHours(0,0,0,0);
-  const target = new Date(d); target.setHours(0,0,0,0);
-  return Math.round((target - today) / 86400000);
-}
-
-// ══════════════════════════════════════════════════════════
 // MARGIN CALC
 // ══════════════════════════════════════════════════════════
-function calcMargin(strike, premium, underPx, optType) {
-  // strike, premium, underPx in 元/份 (not contract value)
-  // Returns 保证金/份
-  if (state.marginMode === 'cash') {
-    // Cash-secured: lock full strike value (for puts)
-    // For calls (covered call writes), simplified: also use strike — but covered call has stock-side
-    // For consistency we use strike as the conservative cash baseline
-    return strike;
-  }
-  // Exchange minimum
-  let virt;  // 虚值额
-  if (optType === 10) {  // put
-    virt = Math.max(underPx - strike, 0);
-  } else {  // call
-    virt = Math.max(strike - underPx, 0);
-  }
+function calcMargin(strike, premium, underPx, isPut) {
+  if (state.marginMode === 'cash') return strike;
+  let virt;
+  if (isPut) virt = Math.max(underPx - strike, 0);
+  else       virt = Math.max(strike - underPx, 0);
   const base = premium + Math.max(0.12 * underPx - virt, 0.07 * strike);
   return base * (1 + state.uplift);
 }
 
 // ══════════════════════════════════════════════════════════
-// DATA FETCH
+// COMPUTE ROW
 // ══════════════════════════════════════════════════════════
-const EM_API = 'https://push2.eastmoney.com/api/qt';
+function computeRow(c, S) {
+  const isPut = c.type === 'P';
+  let premiumPx;
+  if (state.pxMode === 'bid')      premiumPx = c.bid;
+  else if (state.pxMode === 'mid') premiumPx = (c.bid > 0 && c.ask > 0) ? (c.bid + c.ask) / 2 : c.last;
+  else                              premiumPx = c.last;
 
-async function fetchUnderlying() {
-  // Get underlying ETF price
-  const url = `${EM_API}/stock/get?secid=${state.under.secid}&fields=f43,f44,f45,f47,f48,f57,f58,f60,f170&_=${Date.now()}`;
-  try {
-    const r = await fetch(url);
-    const j = await r.json();
-    if (j.data) {
-      state.underPx = j.data.f43 / 1000;  // 东财 ETF 价格通常乘了 1000
-      state.underChg = j.data.f170;       // 涨跌幅
-      // Sanity check: f43 sometimes already in元
-      if (state.underPx < 0.1 || state.underPx > 100) state.underPx = j.data.f43;
-    }
-  } catch(e) {
-    console.warn('fetchUnderlying fail', e);
+  if (!premiumPx || premiumPx <= 0) {
+    return {
+      ...c, underPx: S, isPut, premiumPx: 0,
+      marginPx: 0, premium: 0, margin: 0,
+      yldp: null, yld: null,
+    };
   }
-}
-
-async function fetchOptionList() {
-  // List all contracts (put or call)
-  const url = `${EM_API}/slist/get?secid=${state.under.secid}&pi=0&pz=300&po=0&spt=${state.optType}&fltt=2&invt=2&fid=f161&fields=f12,f14,f161,f250,f334,f2,f3&_=${Date.now()}`;
-  const r = await fetch(url);
-  const j = await r.json();
-  if (!j.data || !j.data.diff) return [];
-  // diff is an object with numeric keys
-  const list = Object.values(j.data.diff);
-  return list.map(d => ({
-    code: d.f12,
-    name: d.f14,
-    strike: d.f161,
-    moneyness: d.f250,
-    underPx: d.f334,
-    lastPx: typeof d.f2 === 'number' ? d.f2 : null,
-    chg: typeof d.f3 === 'number' ? d.f3 : null,
-  })).filter(o => o.strike > 0);
-}
-
-async function fetchOptionQuote(contract) {
-  // Fetch bid/ask/volume/OI for a single contract.
-  // ETF options are on exchanges, secid prefix: 10. = SSE option, 11. = SZSE option
-  // We try both prefixes; one will work.
-  const prefixes = state.under.code.startsWith('5') ? ['10'] : ['11'];
-  for (const pre of prefixes) {
-    const url = `${EM_API}/stock/get?secid=${pre}.${contract.code}&fields=f43,f44,f45,f47,f48,f161,f330,f334,f31,f32,f33,f34,f35,f36,f37,f38,f39,f40,f249,f250,f170&_=${Date.now()}`;
-    try {
-      const r = await fetch(url);
-      const j = await r.json();
-      if (j.data && j.data.f43 !== undefined) return j.data;
-    } catch(e) {}
-  }
-  return null;
-}
-
-async function fetchAllQuotes(contracts) {
-  // Batch parallel fetch (limit concurrency)
-  const CONCURRENT = 6;
-  const results = new Array(contracts.length);
-  let i = 0;
-  async function worker() {
-    while (i < contracts.length) {
-      const idx = i++;
-      results[idx] = await fetchOptionQuote(contracts[idx]);
-    }
-  }
-  await Promise.all(Array.from({length: CONCURRENT}, worker));
-  return results;
+  const margin = calcMargin(c.strike, premiumPx, S, isPut);
+  const yldp = (premiumPx / margin) * 100;
+  const yld = c.days > 0 ? yldp * (365 / c.days) : null;
+  // Moneyness: 认沽时 strike>spot 是 ITM; 认购反之
+  const intrinsicGap = isPut ? (c.strike - S) : (S - c.strike);
+  const moneynessPct = S > 0 ? (intrinsicGap / S) * 100 : 0;
+  return {
+    ...c, underPx: S, isPut, premiumPx,
+    marginPx: margin,
+    premium: premiumPx * CONTRACT_MULTIPLIER,
+    margin: margin * CONTRACT_MULTIPLIER,
+    yldp, yld,
+    moneynessPct,
+  };
 }
 
 // ══════════════════════════════════════════════════════════
@@ -562,86 +435,25 @@ function pctClass(v) {
   if (v >= 5)  return 'yld-lo';
   return 'yld-na';
 }
-function fmtPct(v, digits=2) {
-  if (v === null || v === undefined || isNaN(v)) return '--';
-  return (v >= 0 ? '+' : '') + v.toFixed(digits) + '%';
-}
-function fmtNum(v, d=4) {
-  if (v === null || v === undefined || isNaN(v) || v === 0) return '--';
-  return v.toFixed(d);
-}
 function fmtInt(v) {
   if (v === null || v === undefined || isNaN(v)) return '--';
   return Math.round(v).toLocaleString();
 }
-
-function computeRow(c, q) {
-  if (!q) return null;
-  // Eastmoney quote fields — these field IDs need verification during trading hours
-  // Common assumptions:
-  // f43 = last price, f47 = volume, f48 = amount, f330 = open interest
-  // f31, f33 = ask 1, bid 1 (or vice versa) — TBD
-  const last = q.f43 || 0;
-  const bid = q.f33 || 0;     // 买一价 (best guess)
-  const ask = q.f31 || 0;     // 卖一价 (best guess)
-  const volume = q.f47 || 0;
-  const oi = q.f330 || 0;
-  const underPx = q.f334 || state.underPx;
-
-  // Liquidity check — illiquid if bid=0 or ask=0
-  const illiq = (bid <= 0 || ask <= 0);
-
-  // Premium price selection
-  let premiumPx;
-  if (state.pxMode === 'bid') premiumPx = bid;
-  else if (state.pxMode === 'mid') premiumPx = (bid > 0 && ask > 0) ? (bid + ask) / 2 : last;
-  else premiumPx = last;
-
-  // If no valid premium, mark as null
-  if (premiumPx <= 0) {
-    return {
-      ...c, last, bid, ask, volume, oi, underPx, illiq,
-      premiumPx: 0, marginPx: 0,
-      premium: 0, margin: 0, yldp: null, yld: null,
-      days: daysUntil(parseExpiry(c.name)),
-    };
-  }
-
-  const margin = calcMargin(c.strike, premiumPx, underPx, state.optType);
-  const days = daysUntil(parseExpiry(c.name));
-  const yldp = (premiumPx / margin) * 100;
-  const yld = days > 0 ? yldp * (365 / days) : null;
-
-  // IV 计算: 用中价 (bid+ask)/2 反推, 中价能消除买卖价差噪音
-  // 如果只有一边报价, 退而用 last
-  let ivPx = null;
-  if (bid > 0 && ask > 0) ivPx = (bid + ask) / 2;
-  else if (last > 0) ivPx = last;
-  const iv = (ivPx && days > 0 && underPx > 0)
-    ? calcIV(ivPx, underPx, c.strike, days / 365, RISK_FREE_RATE, state.optType === 10)
-    : null;
-
-  return {
-    ...c, last, bid, ask, volume, oi, underPx, illiq,
-    premiumPx,
-    marginPx: margin,
-    premium: premiumPx * CONTRACT_MULTIPLIER,
-    margin: margin * CONTRACT_MULTIPLIER,
-    yldp, yld, days, iv,
-  };
+function moneynessLabel(pct) {
+  if (Math.abs(pct) < 1) return '平值';
+  return pct > 0 ? '实值' : '虚值';
+}
+function moneynessClass(pct) {
+  if (Math.abs(pct) < 1) return 'tag-atm';
+  return pct > 0 ? 'tag-itm' : 'tag-otm';
 }
 
-function moneynessClass(moneyness, optType) {
-  // For puts: positive moneyness = ITM (strike > spot)
-  // Eastmoney's f250 sign: positive when ITM, negative when OTM (with some scale)
-  if (Math.abs(moneyness) < 2) return 'tag-atm';
-  // We use the moneyness sign as-is — Eastmoney convention
-  if (moneyness > 0) return 'tag-itm';
-  return 'tag-otm';
-}
-function moneynessLabel(moneyness) {
-  if (Math.abs(moneyness) < 2) return '平值';
-  return moneyness > 0 ? '实值' : '虚值';
+function recompute() {
+  const S = state.underPx;
+  state.rows = state.rawContracts
+    .filter(c => c.type === state.optType)
+    .map(c => computeRow(c, S));
+  renderTable();
 }
 
 function renderTable() {
@@ -650,13 +462,16 @@ function renderTable() {
     tbody.innerHTML = '<tr class="load-row"><td colspan="10">暂无数据</td></tr>';
     return;
   }
-  // Sort
   const sk = state.sortKey, sd = state.sortDir;
   const sinks = r => r.illiq;
   const sorted = [...state.rows].sort((a, b) => {
     const sa = sinks(a), sb = sinks(b);
     if (sa !== sb) return sa ? 1 : -1;
-    let va = a[sk], vb = b[sk];
+    let va, vb;
+    if (sk === 'bid')      { va = a.bid; vb = b.bid; }
+    else if (sk === 'expiry')   { va = a.days; vb = b.days; }
+    else if (sk === 'moneyness'){ va = a.moneynessPct; vb = b.moneynessPct; }
+    else { va = a[sk]; vb = b[sk]; }
     if (va === null || va === undefined) va = sd === -1 ? -Infinity : Infinity;
     if (vb === null || vb === undefined) vb = sd === -1 ? -Infinity : Infinity;
     return sd * (va < vb ? -1 : va > vb ? 1 : 0);
@@ -666,20 +481,20 @@ function renderTable() {
     const yld = (r.yld === null || isNaN(r.yld)) ? '--' : r.yld.toFixed(1) + '%';
     const yldp = (r.yldp === null || isNaN(r.yldp)) ? '--' : r.yldp.toFixed(2) + '%';
     const yldCls = pctClass(r.yld);
-    const expDate = parseExpiry(r.name);
-    const expStr = expDate ? `${expDate.getMonth()+1}-${expDate.getDate()}` : '--';
-    const daysStr = r.days !== null ? r.days + '天' : '--';
-    const mCls = moneynessClass(r.moneyness, state.optType);
-    const mLab = moneynessLabel(r.moneyness);
+    const expStr = r.expiry ? r.expiry.slice(5) : '--';
+    const daysStr = r.days + '天';
+    const mLab = moneynessLabel(r.moneynessPct);
+    const mCls = moneynessClass(r.moneynessPct);
     const bid = r.bid > 0 ? r.bid.toFixed(4) : '<span style="color:var(--td)">无</span>';
     const ask = r.ask > 0 ? r.ask.toFixed(4) : '<span style="color:var(--td)">无</span>';
+    const iv = r.iv !== null && r.iv !== undefined ? (r.iv * 100).toFixed(1) + '%' : '<span class="yld-na">--</span>';
     return `<tr class="clickable${r.illiq ? ' illiq' : ''}" onclick="openMdl('${r.code}')">
       <td><div class="tk-name mono">${r.strike.toFixed(4)}</div><div style="font-size:10px;color:var(--td)">${r.name}</div></td>
       <td><div class="mono">${expStr}</div><div style="font-size:10px;color:var(--td)">${daysStr}</div></td>
-      <td><span class="tag ${mCls}">${mLab}</span> <span class="mono" style="font-size:11px">${r.moneyness.toFixed(2)}%</span></td>
+      <td><span class="tag ${mCls}">${mLab}</span> <span class="mono" style="font-size:11px">${r.moneynessPct >= 0 ? '+' : ''}${r.moneynessPct.toFixed(2)}%</span></td>
       <td class="bid-ask"><span class="b">${bid}</span><span class="sep"> / </span><span class="a">${ask}</span></td>
-      <td><div class="mono">${fmtInt(r.volume)}</div><div style="font-size:10px;color:var(--td)">持仓 ${fmtInt(r.oi)}</div></td>
-      <td class="mono">${r.iv !== null ? (r.iv * 100).toFixed(1) + '%' : '<span class="yld-na">--</span>'}</td>
+      <td><div class="mono">${fmtInt(r.volume)}</div><div style="font-size:10px;color:var(--td)">持仓 ${fmtInt(r.openInterest)}</div></td>
+      <td class="mono">${iv}</td>
       <td class="mono">${fmtInt(r.premium)} 元</td>
       <td class="mono">${fmtInt(r.margin)} 元</td>
       <td class="${pctClass(r.yldp)}">${yldp}</td>
@@ -714,18 +529,17 @@ function updateSortUI() {
 }
 
 // ══════════════════════════════════════════════════════════
-// CONTROL HANDLERS
+// HANDLERS
 // ══════════════════════════════════════════════════════════
 function onChangeUnder() {
-  const code = underSel.value;
-  state.under = UNDERLYINGS.find(u => u.code === code);
+  state.under = UNDERLYINGS.find(u => u.code === underSel.value);
   doRefresh();
 }
 function setOptType(t) {
-  state.optType = t;
-  document.getElementById('optPut').classList.toggle('on', t === 10);
-  document.getElementById('optCall').classList.toggle('on', t === 9);
-  doRefresh();
+  state.optType = t;  // 'P' or 'C'
+  document.getElementById('optPut').classList.toggle('on', t === 'P');
+  document.getElementById('optCall').classList.toggle('on', t === 'C');
+  recompute();
 }
 function setMarginMode(m) {
   state.marginMode = m;
@@ -744,20 +558,11 @@ function setPxMode(m) {
   ['bid','mid','last'].forEach(k => document.getElementById('px'+k.charAt(0).toUpperCase()+k.slice(1)).classList.toggle('on', k === m));
   recompute();
 }
-// Prevent tooltip clicks from sorting
 document.querySelectorAll('.tip').forEach(t => t.addEventListener('click', e => e.stopPropagation()));
 
 // ══════════════════════════════════════════════════════════
-// REFRESH
+// REFRESH (load JSON)
 // ══════════════════════════════════════════════════════════
-function recompute() {
-  state.rows = state.rows.map(r => {
-    const fakeQuote = {f43: r.last||0, f31: r.ask||0, f33: r.bid||0, f47: r.volume||0, f330: r.oi||0, f334: r.underPx||state.underPx};
-    return computeRow(r, fakeQuote);
-  }).filter(Boolean);
-  renderTable();
-}
-
 async function doRefresh() {
   if (state.loading) return;
   state.loading = true;
@@ -767,45 +572,49 @@ async function doRefresh() {
   const ic = document.getElementById('rfIcon');
   btn.classList.add('loading');
   ic.style.animation = 'spin .7s linear infinite';
-
   const errBar = document.getElementById('errBar');
   errBar.style.display = 'none';
 
-  try {
-    // First load: show spinner
-    if (state.rows.length === 0) {
-      document.getElementById('tbody').innerHTML =
-        `<tr class="load-row"><td colspan="10"><span class="lspin"></span>加载 ${state.under.name} 期权数据...</td></tr>`;
-    }
+  if (state.rows.length === 0) {
+    document.getElementById('tbody').innerHTML =
+      `<tr class="load-row"><td colspan="10"><span class="lspin"></span>加载 ${state.under.name} 期权数据...</td></tr>`;
+  }
 
-    await fetchUnderlying();
-    document.getElementById('underName').textContent = state.under.name;
+  try {
+    const resp = await fetch(`/data/${state.under.code}.json?_=${Date.now()}`);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const j = await resp.json();
+
+    state.underPx = j._meta.spot.price || 0;
+    state.underChg = j._meta.spot.prevClose > 0
+      ? ((state.underPx / j._meta.spot.prevClose - 1) * 100)
+      : 0;
+    state.underName = j._meta.spot.name || state.under.name;
+    state.dataUpdated = j._meta.updated || '';
+    state.rawContracts = j.contracts || [];
+
+    document.getElementById('underName').textContent = state.underName;
     document.getElementById('underPrice').textContent = state.underPx > 0 ? state.underPx.toFixed(4) : '--';
     const chgEl = document.getElementById('underChg');
-    if (typeof state.underChg === 'number') {
-      const sign = state.underChg >= 0 ? '+' : '';
-      chgEl.textContent = sign + state.underChg.toFixed(2) + '%';
-      chgEl.style.color = state.underChg >= 0 ? 'var(--g)' : 'var(--r)';
-    }
+    const sign = state.underChg >= 0 ? '+' : '';
+    chgEl.textContent = sign + state.underChg.toFixed(2) + '%';
+    chgEl.style.color = state.underChg >= 0 ? 'var(--g)' : 'var(--r)';
 
-    const contracts = await fetchOptionList();
-    if (contracts.length === 0) throw new Error('期权链为空');
-    const quotes = await fetchAllQuotes(contracts);
-    state.rows = contracts.map((c, i) => computeRow(c, quotes[i])).filter(Boolean);
+    recompute();
 
   } catch(e) {
     console.error(e);
-    errBar.textContent = '⚠ 数据获取失败: ' + e.message;
+    errBar.textContent = '⚠ 数据加载失败: ' + e.message;
     errBar.style.display = 'inline-block';
+    state.rows = [];
+    renderTable();
   }
 
-  const now = new Date();
-  document.getElementById('updTime').textContent =
-    now.toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  // Show data timestamp (not browser current time — data may be stale by minutes)
+  const t = state.dataUpdated;
+  document.getElementById('updTime').textContent = t ? t.slice(11, 16) : new Date().toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'});
 
   renderMktStatus();
-  renderTable();
-
   ic.style.animation = '';
   btn.classList.remove('loading');
   state.loading = false;
@@ -826,37 +635,36 @@ function startCountdown() {
 }
 
 // ══════════════════════════════════════════════════════════
-// MODAL
+// MODAL (share card)
 // ══════════════════════════════════════════════════════════
+function fmt4(v) { return (v === null || v === undefined || isNaN(v)) ? '--' : Number(v).toFixed(4); }
+function fmtPct(v, d=2) { return (v === null || v === undefined || isNaN(v)) ? '--' : (v>=0?'+':'') + Number(v).toFixed(d) + '%'; }
+
 function openMdl(code) {
   const r = state.rows.find(x => x.code === code);
   if (!r) return;
-  const expDate = parseExpiry(r.name);
-  const expFull = expDate ? `${expDate.getFullYear()}-${String(expDate.getMonth()+1).padStart(2,'0')}-${String(expDate.getDate()).padStart(2,'0')}` : '--';
-  const optTypeLabel = state.optType === 10 ? '认沽 PUT' : '认购 CALL';
-  const mLab = moneynessLabel(r.moneyness);
-  const mCls = moneynessClass(r.moneyness, state.optType);
+  const optTypeLabel = r.isPut ? '认沽 PUT' : '认购 CALL';
+  const mLab = moneynessLabel(r.moneynessPct);
+  const mCls = moneynessClass(r.moneynessPct);
   const yldCls = pctClass(r.yld);
 
-  // Calc explanation
   let mgnFormula;
   if (state.marginMode === 'cash') {
-    mgnFormula = `保证金 = 行权价 × 10000\n         = ${r.strike} × 10000\n         = <b>${fmtInt(r.margin)}</b> 元`;
+    mgnFormula = `保证金 = 行权价 × 10000
+         = ${r.strike} × 10000
+         = <b>${fmtInt(r.margin)}</b> 元`;
   } else {
-    const virt = state.optType === 10
-      ? Math.max(r.underPx - r.strike, 0)
-      : Math.max(r.strike - r.underPx, 0);
+    const virt = r.isPut ? Math.max(r.underPx - r.strike, 0) : Math.max(r.strike - r.underPx, 0);
     const term1 = 0.12 * r.underPx - virt;
     const term2 = 0.07 * r.strike;
-    const useT = Math.max(term1, term2);
-    mgnFormula = `${state.optType === 10 ? '认沽' : '认购'}虚值 = max(标的−行权, 0) = ${virt.toFixed(4)}
+    mgnFormula = `${r.isPut ? '认沽' : '认购'}虚值 = max(标的−行权, 0) = ${virt.toFixed(4)}
 保证金/份 = 权利金 + max(12%×标的−虚值, 7%×行权价)
          = ${r.premiumPx.toFixed(4)} + max(${term1.toFixed(4)}, ${term2.toFixed(4)})
-         = <b>${r.marginPx.toFixed(4)}</b> × ${state.uplift > 0 ? `(1+${(state.uplift*100).toFixed(0)}%)` : ''}
+         = <b>${r.marginPx.toFixed(4)}</b>${state.uplift > 0 ? ` × (1+${(state.uplift*100).toFixed(0)}%)` : ''}
 单合约 = <b>${fmtInt(r.margin)}</b> 元`;
   }
 
-  const dateStr = new Date().toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'}).replace(/\//g,'-');
+  const dateStr = (state.dataUpdated || '').slice(5,16).replace('T',' ');
 
   document.getElementById('mdlBody').innerHTML = `
     <div class="mdl-hd">
@@ -867,7 +675,7 @@ function openMdl(code) {
     <div class="mdl-title">${r.name}</div>
     <div class="mdl-sub">
       <span class="tk">${r.code}</span>
-      <span class="b tag-${state.optType === 10 ? 'otm' : 'itm'}">${optTypeLabel}</span>
+      <span class="b tag-${r.isPut ? 'otm' : 'itm'}">${optTypeLabel}</span>
       <span class="b ${mCls}">${mLab}</span>
       ${r.illiq ? `<span class="b" style="background:rgba(100,116,139,.2);color:var(--td)">单边/无流动性</span>` : ''}
     </div>
@@ -895,15 +703,15 @@ function openMdl(code) {
     <div class="mdl-info">
       <div class="mdl-info-item">
         <span class="mdl-info-lab">标的现价</span>
-        <span class="mdl-info-val">${r.underPx ? r.underPx.toFixed(4) : '--'}</span>
+        <span class="mdl-info-val">${fmt4(r.underPx)}</span>
       </div>
       <div class="mdl-info-item">
         <span class="mdl-info-lab">行权价</span>
-        <span class="mdl-info-val mid">${r.strike.toFixed(4)}</span>
+        <span class="mdl-info-val mid">${fmt4(r.strike)}</span>
       </div>
       <div class="mdl-info-item">
         <span class="mdl-info-lab">到期日</span>
-        <span class="mdl-info-val">${expFull}</span>
+        <span class="mdl-info-val">${r.expiry || '--'}</span>
       </div>
       <div class="mdl-info-item">
         <span class="mdl-info-lab">剩余天数</span>
@@ -915,15 +723,15 @@ function openMdl(code) {
       </div>
       <div class="mdl-info-item">
         <span class="mdl-info-lab">成交 / 持仓</span>
-        <span class="mdl-info-val" style="font-size:12px">${fmtInt(r.volume)} / ${fmtInt(r.oi)}</span>
+        <span class="mdl-info-val" style="font-size:12px">${fmtInt(r.volume)} / ${fmtInt(r.openInterest)}</span>
       </div>
       <div class="mdl-info-item">
         <span class="mdl-info-lab">隐含波动率 IV</span>
-        <span class="mdl-info-val ${r.iv === null ? '' : r.iv > 0.30 ? 'warn' : r.iv > 0.20 ? 'mid' : 'ok'}">${r.iv !== null ? (r.iv*100).toFixed(1) + '%' : '--'}</span>
+        <span class="mdl-info-val ${r.iv === null || r.iv === undefined ? '' : r.iv > 0.30 ? 'warn' : r.iv > 0.20 ? 'mid' : 'ok'}">${(r.iv !== null && r.iv !== undefined) ? (r.iv*100).toFixed(1) + '%' : '--'}</span>
       </div>
       <div class="mdl-info-item">
-        <span class="mdl-info-lab">无风险利率</span>
-        <span class="mdl-info-val" style="font-size:12px">${(RISK_FREE_RATE*100).toFixed(1)}%</span>
+        <span class="mdl-info-lab">Delta</span>
+        <span class="mdl-info-val" style="font-size:12px">${r.delta !== null && r.delta !== undefined ? r.delta.toFixed(3) : '--'}</span>
       </div>
     </div>
 
