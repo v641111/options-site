@@ -1,27 +1,6 @@
 {
-  "updated": "2026-06-10T17:02:45+08:00",
+  "updated": "2026-06-10T17:59:28+08:00",
   "underlyings": [
-    {
-      "code": "510050",
-      "name": "上证50ETF华夏",
-      "short": "50ETF",
-      "secid": "1.510050",
-      "spot": {
-        "price": 2.931,
-        "prevClose": 2.917,
-        "open": 2.904,
-        "high": 2.941,
-        "low": 2.904,
-        "name": "上证50ETF华夏"
-      },
-      "counts": {
-        "total": 122,
-        "calls": 61,
-        "puts": 61,
-        "iv_computed": 115,
-        "illiquid": 0
-      }
-    },
     {
       "code": "510300",
       "name": "沪深300ETF华泰柏瑞",
@@ -40,69 +19,6 @@
         "calls": 66,
         "puts": 66,
         "iv_computed": 109,
-        "illiquid": 0
-      }
-    },
-    {
-      "code": "510500",
-      "name": "中证500ETF南方",
-      "short": "500ETF沪",
-      "secid": "1.510500",
-      "spot": {
-        "price": 8.171,
-        "prevClose": 8.27,
-        "open": 8.184,
-        "high": 8.24,
-        "low": 8.078,
-        "name": "中证500ETF南方"
-      },
-      "counts": {
-        "total": 140,
-        "calls": 70,
-        "puts": 70,
-        "iv_computed": 120,
-        "illiquid": 0
-      }
-    },
-    {
-      "code": "588000",
-      "name": "科创50ETF华夏",
-      "short": "科创50华夏",
-      "secid": "1.588000",
-      "spot": {
-        "price": 1.744,
-        "prevClose": 1.755,
-        "open": 1.748,
-        "high": 1.818,
-        "low": 1.724,
-        "name": "科创50ETF华夏"
-      },
-      "counts": {
-        "total": 158,
-        "calls": 79,
-        "puts": 79,
-        "iv_computed": 132,
-        "illiquid": 0
-      }
-    },
-    {
-      "code": "588080",
-      "name": "科创50ETF易方达",
-      "short": "科创50易",
-      "secid": "1.588080",
-      "spot": {
-        "price": 1.691,
-        "prevClose": 1.701,
-        "open": 1.69,
-        "high": 1.759,
-        "low": 1.667,
-        "name": "科创50ETF易方达"
-      },
-      "counts": {
-        "total": 154,
-        "calls": 77,
-        "puts": 77,
-        "iv_computed": 131,
         "illiquid": 0
       }
     },
