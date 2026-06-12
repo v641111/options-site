@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-12T16:03:10+08:00",
+  "updated": "2026-06-12T17:15:03+08:00",
   "underlyings": [
     {
       "code": "510050",
@@ -125,27 +125,6 @@
         "puts": 68,
         "iv_computed": 113,
         "illiquid": 1
-      }
-    },
-    {
-      "code": "159915",
-      "name": "创业板ETF易方达",
-      "short": "创业板ETF",
-      "secid": "0.159915",
-      "spot": {
-        "price": 3.846,
-        "prevClose": 3.83,
-        "open": 3.932,
-        "high": 3.934,
-        "low": 3.835,
-        "name": "创业板"
-      },
-      "counts": {
-        "total": 134,
-        "calls": 67,
-        "puts": 67,
-        "iv_computed": 114,
-        "illiquid": 0
       }
     },
     {
