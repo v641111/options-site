@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-16T16:49:30+08:00",
+  "updated": "2026-06-16T17:07:41+08:00",
   "underlyings": [
     {
       "code": "510050",
@@ -19,48 +19,6 @@
         "calls": 61,
         "puts": 61,
         "iv_computed": 118,
-        "illiquid": 0
-      }
-    },
-    {
-      "code": "510300",
-      "name": "沪深300ETF华泰柏瑞",
-      "short": "300ETF沪",
-      "secid": "1.510300",
-      "spot": {
-        "price": 4.91,
-        "prevClose": 4.919,
-        "open": 4.92,
-        "high": 4.933,
-        "low": 4.893,
-        "name": "沪深300ETF华泰柏瑞"
-      },
-      "counts": {
-        "total": 132,
-        "calls": 66,
-        "puts": 66,
-        "iv_computed": 108,
-        "illiquid": 0
-      }
-    },
-    {
-      "code": "510500",
-      "name": "中证500ETF南方",
-      "short": "500ETF沪",
-      "secid": "1.510500",
-      "spot": {
-        "price": 8.632,
-        "prevClose": 8.544,
-        "open": 8.55,
-        "high": 8.668,
-        "low": 8.525,
-        "name": "中证500ETF南方"
-      },
-      "counts": {
-        "total": 140,
-        "calls": 70,
-        "puts": 70,
-        "iv_computed": 107,
         "illiquid": 0
       }
     },
@@ -104,27 +62,6 @@
         "puts": 77,
         "iv_computed": 124,
         "illiquid": 0
-      }
-    },
-    {
-      "code": "159901",
-      "name": "深证100ETF易方达",
-      "short": "深100ETF",
-      "secid": "0.159901",
-      "spot": {
-        "price": 4.027,
-        "prevClose": 4.005,
-        "open": 4.012,
-        "high": 4.049,
-        "low": 3.997,
-        "name": "深100ETF"
-      },
-      "counts": {
-        "total": 136,
-        "calls": 68,
-        "puts": 68,
-        "iv_computed": 104,
-        "illiquid": 4
       }
     },
     {
