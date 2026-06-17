@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-17T18:05:29+08:00",
+  "updated": "2026-06-17T18:54:48+08:00",
   "underlyings": [
     {
       "code": "510050",
@@ -40,27 +40,6 @@
         "calls": 66,
         "puts": 66,
         "iv_computed": 105,
-        "illiquid": 0
-      }
-    },
-    {
-      "code": "510500",
-      "name": "中证500ETF南方",
-      "short": "500ETF沪",
-      "secid": "1.510500",
-      "spot": {
-        "price": 8.763,
-        "prevClose": 8.632,
-        "open": 8.602,
-        "high": 8.766,
-        "low": 8.58,
-        "name": "中证500ETF南方"
-      },
-      "counts": {
-        "total": 140,
-        "calls": 70,
-        "puts": 70,
-        "iv_computed": 107,
         "illiquid": 0
       }
     },
@@ -128,27 +107,6 @@
       }
     },
     {
-      "code": "159915",
-      "name": "创业板ETF易方达",
-      "short": "创业板ETF",
-      "secid": "0.159915",
-      "spot": {
-        "price": 4.183,
-        "prevClose": 4.111,
-        "open": 4.086,
-        "high": 4.183,
-        "low": 4.071,
-        "name": "创业板"
-      },
-      "counts": {
-        "total": 134,
-        "calls": 67,
-        "puts": 67,
-        "iv_computed": 101,
-        "illiquid": 3
-      }
-    },
-    {
       "code": "159919",
       "name": "沪深300ETF嘉实",
       "short": "300ETF深",
@@ -167,27 +125,6 @@
         "puts": 62,
         "iv_computed": 96,
         "illiquid": 0
-      }
-    },
-    {
-      "code": "159922",
-      "name": "中证500ETF嘉实",
-      "short": "500ETF深",
-      "secid": "0.159922",
-      "spot": {
-        "price": 3.486,
-        "prevClose": 3.435,
-        "open": 3.413,
-        "high": 3.487,
-        "low": 3.411,
-        "name": "500ETF"
-      },
-      "counts": {
-        "total": 144,
-        "calls": 72,
-        "puts": 72,
-        "iv_computed": 104,
-        "illiquid": 3
       }
     }
   ]
