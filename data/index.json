@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-18T18:20:06+08:00",
+  "updated": "2026-06-18T19:03:41+08:00",
   "underlyings": [
     {
       "code": "510050",
@@ -82,6 +82,27 @@
         "calls": 79,
         "puts": 79,
         "iv_computed": 117,
+        "illiquid": 0
+      }
+    },
+    {
+      "code": "588080",
+      "name": "科创50ETF易方达",
+      "short": "科创50易",
+      "secid": "1.588080",
+      "spot": {
+        "price": 1.953,
+        "prevClose": 1.878,
+        "open": 1.876,
+        "high": 1.976,
+        "low": 1.871,
+        "name": "科创50ETF易方达"
+      },
+      "counts": {
+        "total": 154,
+        "calls": 77,
+        "puts": 77,
+        "iv_computed": 115,
         "illiquid": 0
       }
     },
