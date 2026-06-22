@@ -1,6 +1,27 @@
 {
-  "updated": "2026-06-22T18:48:58+08:00",
+  "updated": "2026-06-22T19:52:24+08:00",
   "underlyings": [
+    {
+      "code": "510050",
+      "name": "上证50ETF华夏",
+      "short": "50ETF",
+      "secid": "1.510050",
+      "spot": {
+        "price": 3.097,
+        "prevClose": 3.017,
+        "open": 3.014,
+        "high": 3.098,
+        "low": 2.998,
+        "name": "上证50ETF华夏"
+      },
+      "counts": {
+        "total": 122,
+        "calls": 61,
+        "puts": 61,
+        "iv_computed": 106,
+        "illiquid": 0
+      }
+    },
     {
       "code": "510300",
       "name": "沪深300ETF华泰柏瑞",
