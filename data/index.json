@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-23T13:48:54+08:00",
+  "updated": "2026-06-23T14:54:11+08:00",
   "underlyings": [
     {
       "code": "510050",
@@ -7,18 +7,18 @@
       "short": "50ETF",
       "secid": "1.510050",
       "spot": {
-        "price": 3.029,
+        "price": 3.006,
         "prevClose": 3.097,
         "open": 3.089,
         "high": 3.103,
-        "low": 3.026,
+        "low": 2.992,
         "name": "上证50ETF华夏"
       },
       "counts": {
         "total": 124,
         "calls": 62,
         "puts": 62,
-        "iv_computed": 116,
+        "iv_computed": 115,
         "illiquid": 0
       }
     },
@@ -28,11 +28,11 @@
       "short": "300ETF沪",
       "secid": "1.510300",
       "spot": {
-        "price": 4.979,
+        "price": 4.947,
         "prevClose": 5.091,
         "open": 5.079,
         "high": 5.095,
-        "low": 4.972,
+        "low": 4.915,
         "name": "沪深300ETF华泰柏瑞"
       },
       "counts": {
@@ -49,18 +49,18 @@
       "short": "500ETF沪",
       "secid": "1.510500",
       "spot": {
-        "price": 8.882,
+        "price": 8.822,
         "prevClose": 9.007,
         "open": 8.98,
         "high": 9.028,
-        "low": 8.872,
+        "low": 8.758,
         "name": "中证500ETF南方"
       },
       "counts": {
         "total": 142,
         "calls": 71,
         "puts": 71,
-        "iv_computed": 105,
+        "iv_computed": 106,
         "illiquid": 0
       }
     },
@@ -70,18 +70,18 @@
       "short": "科创50华夏",
       "secid": "1.588000",
       "spot": {
-        "price": 2.034,
+        "price": 2.022,
         "prevClose": 2.056,
         "open": 2.04,
         "high": 2.09,
-        "low": 2.0,
+        "low": 1.992,
         "name": "科创50ETF华夏"
       },
       "counts": {
         "total": 168,
         "calls": 84,
         "puts": 84,
-        "iv_computed": 126,
+        "iv_computed": 125,
         "illiquid": 0
       }
     },
@@ -91,19 +91,19 @@
       "short": "科创50易",
       "secid": "1.588080",
       "spot": {
-        "price": 1.97,
+        "price": 1.957,
         "prevClose": 1.99,
         "open": 1.971,
         "high": 2.023,
-        "low": 1.935,
+        "low": 1.93,
         "name": "科创50ETF易方达"
       },
       "counts": {
         "total": 164,
         "calls": 82,
         "puts": 82,
-        "iv_computed": 124,
-        "illiquid": 0
+        "iv_computed": 123,
+        "illiquid": 1
       }
     },
     {
@@ -112,11 +112,11 @@
       "short": "深100ETF",
       "secid": "0.159901",
       "spot": {
-        "price": 4.1,
+        "price": 4.064,
         "prevClose": 4.207,
         "open": 4.201,
         "high": 4.205,
-        "low": 4.09,
+        "low": 4.038,
         "name": "深100ETF"
       },
       "counts": {
@@ -133,19 +133,19 @@
       "short": "创业板ETF",
       "secid": "0.159915",
       "spot": {
-        "price": 4.25,
+        "price": 4.213,
         "prevClose": 4.379,
         "open": 4.379,
         "high": 4.379,
-        "low": 4.23,
+        "low": 4.17,
         "name": "创业板"
       },
       "counts": {
         "total": 158,
         "calls": 79,
         "puts": 79,
-        "iv_computed": 127,
-        "illiquid": 14
+        "iv_computed": 141,
+        "illiquid": 11
       }
     },
     {
@@ -154,19 +154,19 @@
       "short": "300ETF深",
       "secid": "0.159919",
       "spot": {
-        "price": 5.194,
+        "price": 5.155,
         "prevClose": 5.315,
         "open": 5.3,
         "high": 5.31,
-        "low": 5.186,
+        "low": 5.13,
         "name": "沪深300"
       },
       "counts": {
         "total": 124,
         "calls": 62,
         "puts": 62,
-        "iv_computed": 107,
-        "illiquid": 15
+        "iv_computed": 97,
+        "illiquid": 16
       }
     },
     {
@@ -175,19 +175,19 @@
       "short": "500ETF深",
       "secid": "0.159922",
       "spot": {
-        "price": 3.543,
+        "price": 3.513,
         "prevClose": 3.582,
         "open": 3.578,
         "high": 3.591,
-        "low": 3.527,
+        "low": 3.483,
         "name": "500ETF"
       },
       "counts": {
         "total": 148,
         "calls": 74,
         "puts": 74,
-        "iv_computed": 97,
-        "illiquid": 25
+        "iv_computed": 100,
+        "illiquid": 27
       }
     }
   ]
