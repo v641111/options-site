@@ -1,6 +1,27 @@
 {
-  "updated": "2026-06-23T18:26:16+08:00",
+  "updated": "2026-06-23T18:41:22+08:00",
   "underlyings": [
+    {
+      "code": "510050",
+      "name": "上证50ETF华夏",
+      "short": "50ETF",
+      "secid": "1.510050",
+      "spot": {
+        "price": 3.005,
+        "prevClose": 3.097,
+        "open": 3.089,
+        "high": 3.103,
+        "low": 2.992,
+        "name": "上证50ETF华夏"
+      },
+      "counts": {
+        "total": 124,
+        "calls": 62,
+        "puts": 62,
+        "iv_computed": 114,
+        "illiquid": 0
+      }
+    },
     {
       "code": "510300",
       "name": "沪深300ETF华泰柏瑞",
@@ -65,27 +86,6 @@
       }
     },
     {
-      "code": "588080",
-      "name": "科创50ETF易方达",
-      "short": "科创50易",
-      "secid": "1.588080",
-      "spot": {
-        "price": 1.956,
-        "prevClose": 1.99,
-        "open": 1.971,
-        "high": 2.023,
-        "low": 1.93,
-        "name": "科创50ETF易方达"
-      },
-      "counts": {
-        "total": 164,
-        "calls": 82,
-        "puts": 82,
-        "iv_computed": 124,
-        "illiquid": 0
-      }
-    },
-    {
       "code": "159901",
       "name": "深证100ETF易方达",
       "short": "深100ETF",
@@ -103,27 +103,6 @@
         "calls": 72,
         "puts": 72,
         "iv_computed": 110,
-        "illiquid": 10
-      }
-    },
-    {
-      "code": "159915",
-      "name": "创业板ETF易方达",
-      "short": "创业板ETF",
-      "secid": "0.159915",
-      "spot": {
-        "price": 4.21,
-        "prevClose": 4.379,
-        "open": 4.379,
-        "high": 4.379,
-        "low": 4.17,
-        "name": "创业板"
-      },
-      "counts": {
-        "total": 158,
-        "calls": 79,
-        "puts": 79,
-        "iv_computed": 131,
         "illiquid": 10
       }
     },
