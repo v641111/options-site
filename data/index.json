@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-23T14:54:11+08:00",
+  "updated": "2026-06-23T15:00:19+08:00",
   "underlyings": [
     {
       "code": "510050",
@@ -7,7 +7,7 @@
       "short": "50ETF",
       "secid": "1.510050",
       "spot": {
-        "price": 3.006,
+        "price": 3.005,
         "prevClose": 3.097,
         "open": 3.089,
         "high": 3.103,
@@ -18,8 +18,8 @@
         "total": 124,
         "calls": 62,
         "puts": 62,
-        "iv_computed": 115,
-        "illiquid": 0
+        "iv_computed": 113,
+        "illiquid": 84
       }
     },
     {
@@ -28,7 +28,7 @@
       "short": "300ETF沪",
       "secid": "1.510300",
       "spot": {
-        "price": 4.947,
+        "price": 4.941,
         "prevClose": 5.091,
         "open": 5.079,
         "high": 5.095,
@@ -39,8 +39,8 @@
         "total": 132,
         "calls": 66,
         "puts": 66,
-        "iv_computed": 105,
-        "illiquid": 0
+        "iv_computed": 107,
+        "illiquid": 78
       }
     },
     {
@@ -49,7 +49,7 @@
       "short": "500ETF沪",
       "secid": "1.510500",
       "spot": {
-        "price": 8.822,
+        "price": 8.813,
         "prevClose": 9.007,
         "open": 8.98,
         "high": 9.028,
@@ -60,8 +60,8 @@
         "total": 142,
         "calls": 71,
         "puts": 71,
-        "iv_computed": 106,
-        "illiquid": 0
+        "iv_computed": 110,
+        "illiquid": 104
       }
     },
     {
@@ -70,7 +70,7 @@
       "short": "科创50华夏",
       "secid": "1.588000",
       "spot": {
-        "price": 2.022,
+        "price": 2.023,
         "prevClose": 2.056,
         "open": 2.04,
         "high": 2.09,
@@ -81,8 +81,8 @@
         "total": 168,
         "calls": 84,
         "puts": 84,
-        "iv_computed": 125,
-        "illiquid": 0
+        "iv_computed": 124,
+        "illiquid": 109
       }
     },
     {
@@ -91,7 +91,7 @@
       "short": "科创50易",
       "secid": "1.588080",
       "spot": {
-        "price": 1.957,
+        "price": 1.956,
         "prevClose": 1.99,
         "open": 1.971,
         "high": 2.023,
@@ -102,8 +102,8 @@
         "total": 164,
         "calls": 82,
         "puts": 82,
-        "iv_computed": 123,
-        "illiquid": 1
+        "iv_computed": 126,
+        "illiquid": 121
       }
     },
     {
@@ -112,7 +112,7 @@
       "short": "深100ETF",
       "secid": "0.159901",
       "spot": {
-        "price": 4.064,
+        "price": 4.065,
         "prevClose": 4.207,
         "open": 4.201,
         "high": 4.205,
@@ -123,8 +123,8 @@
         "total": 144,
         "calls": 72,
         "puts": 72,
-        "iv_computed": 109,
-        "illiquid": 19
+        "iv_computed": 110,
+        "illiquid": 106
       }
     },
     {
@@ -133,7 +133,7 @@
       "short": "创业板ETF",
       "secid": "0.159915",
       "spot": {
-        "price": 4.213,
+        "price": 4.21,
         "prevClose": 4.379,
         "open": 4.379,
         "high": 4.379,
@@ -144,8 +144,8 @@
         "total": 158,
         "calls": 79,
         "puts": 79,
-        "iv_computed": 141,
-        "illiquid": 11
+        "iv_computed": 131,
+        "illiquid": 10
       }
     },
     {
@@ -154,7 +154,7 @@
       "short": "300ETF深",
       "secid": "0.159919",
       "spot": {
-        "price": 5.155,
+        "price": 5.16,
         "prevClose": 5.315,
         "open": 5.3,
         "high": 5.31,
@@ -165,8 +165,8 @@
         "total": 124,
         "calls": 62,
         "puts": 62,
-        "iv_computed": 97,
-        "illiquid": 16
+        "iv_computed": 96,
+        "illiquid": 2
       }
     },
     {
@@ -175,7 +175,7 @@
       "short": "500ETF深",
       "secid": "0.159922",
       "spot": {
-        "price": 3.513,
+        "price": 3.509,
         "prevClose": 3.582,
         "open": 3.578,
         "high": 3.591,
@@ -186,8 +186,8 @@
         "total": 148,
         "calls": 74,
         "puts": 74,
-        "iv_computed": 100,
-        "illiquid": 27
+        "iv_computed": 112,
+        "illiquid": 7
       }
     }
   ]
