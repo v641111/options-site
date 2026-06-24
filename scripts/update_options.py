@@ -328,18 +328,135 @@ def scrape_underlying(under):
     }
 
 
+# ─── Historical IV tracking ────────────────────────────────
+# 每个交易日为每只 ETF 的每个到期月份保存 ATM put/call IV 快照
+# 用于 IV 历史百分位 / 30D 均值对比
+HISTORY_DIR = ROOT / "data" / "history"
+HISTORY_KEEP_DAYS = 365
+
+
+def compute_atm_iv_per_expiry(contracts, spot):
+    """For each unique expiry month, find ATM put/call IV. Returns:
+    {"2026-06": {"put": 0.154, "call": 0.148, "days": 19}, ...}
+    """
+    from collections import defaultdict
+    by_exp = defaultdict(lambda: {"puts": [], "calls": []})
+    for c in contracts:
+        if c.get("iv") is None or c.get("illiq") or not c.get("expiry"):
+            continue
+        key = c["expiry"][:7]
+        if c["type"] == "P":
+            by_exp[key]["puts"].append(c)
+        elif c["type"] == "C":
+            by_exp[key]["calls"].append(c)
+
+    result = {}
+    for key, groups in by_exp.items():
+        puts = sorted(groups["puts"], key=lambda c: abs(c["strike"] - spot))
+        calls = sorted(groups["calls"], key=lambda c: abs(c["strike"] - spot))
+        atm_put = puts[0] if puts else None
+        atm_call = calls[0] if calls else None
+        result[key] = {
+            "put":  atm_put["iv"] if atm_put else None,
+            "call": atm_call["iv"] if atm_call else None,
+            "days": (atm_put or atm_call)["days"] if (atm_put or atm_call) else None,
+        }
+    return result
+
+
+def update_history(under_code, atm_iv_today, today_str):
+    """Append today's snapshot to history file. Keep last N days."""
+    HISTORY_DIR.mkdir(parents=True, exist_ok=True)
+    hist_path = HISTORY_DIR / f"{under_code}.json"
+    if hist_path.exists():
+        try:
+            hist = json.loads(hist_path.read_text(encoding="utf-8"))
+        except Exception:
+            hist = {}
+    else:
+        hist = {}
+    # Overwrite/insert today
+    hist[today_str] = atm_iv_today
+    # Keep only last HISTORY_KEEP_DAYS dates
+    keys_sorted = sorted(hist.keys(), reverse=True)
+    if len(keys_sorted) > HISTORY_KEEP_DAYS:
+        for old_key in keys_sorted[HISTORY_KEEP_DAYS:]:
+            hist.pop(old_key, None)
+    hist_path.write_text(json.dumps(hist, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    return hist
+
+
+def compute_iv_stats(hist, expiry_key, opt_type, days=30):
+    """Given history dict, expiry month key (YYYY-MM), opt_type ('put'/'call'),
+    return {avg, min, max, percentile, count} over last N days."""
+    today = datetime.now(BJ).date()
+    cutoff = today - timedelta(days=days)
+    vals = []
+    for date_str, snap in hist.items():
+        try:
+            d = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except Exception:
+            continue
+        if d < cutoff:
+            continue
+        ex = snap.get(expiry_key)
+        if not ex:
+            continue
+        v = ex.get(opt_type)
+        if v is not None:
+            vals.append(v)
+    if not vals:
+        return None
+    vals_sorted = sorted(vals)
+    n = len(vals_sorted)
+    today_v = vals_sorted[-1]  # latest (approximation)
+    # Better: get today's value explicitly
+    today_str = today.isoformat()
+    snap = hist.get(today_str)
+    if snap and snap.get(expiry_key) and snap[expiry_key].get(opt_type) is not None:
+        today_v = snap[expiry_key][opt_type]
+    # Percentile of today's value in history
+    below = sum(1 for v in vals_sorted if v < today_v)
+    pct = (below / n) * 100 if n > 0 else None
+    return {
+        "avg": sum(vals) / n,
+        "min": min(vals),
+        "max": max(vals),
+        "percentile": pct,
+        "count": n,
+    }
+
+
 # ─── Main ──────────────────────────────────────────────────
 def main():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     index_meta = []
+    today_str = datetime.now(BJ).date().isoformat()
 
     for under in UNDERLYINGS:
         data = scrape_underlying(under)
         if not data:
             continue
+
+        # Historical IV snapshot
+        spot = data["_meta"]["spot"]["price"]
+        atm_iv_today = compute_atm_iv_per_expiry(data["contracts"], spot)
+        hist = update_history(under["code"], atm_iv_today, today_str)
+
+        # Compute 30D stats and embed in each contract's data
+        # (per expiry, put/call)
+        iv_stats = {}  # expiry_key -> {put: {...}, call: {...}}
+        for exp_key in atm_iv_today.keys():
+            iv_stats[exp_key] = {
+                "put":  compute_iv_stats(hist, exp_key, "put",  days=30),
+                "call": compute_iv_stats(hist, exp_key, "call", days=30),
+            }
+        data["_meta"]["ivStats30D"] = iv_stats
+        data["_meta"]["ivToday"] = atm_iv_today
+
         out_path = OUT_DIR / f"{under['code']}.json"
         out_path.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-        print(f"  -> {out_path.name} ({out_path.stat().st_size} bytes)")
+        print(f"  -> {out_path.name} ({out_path.stat().st_size} bytes)  history: {len(hist)} days")
         index_meta.append({
             "code": under["code"],
             "name": under["name"],
@@ -347,6 +464,7 @@ def main():
             "secid": under["secid"],
             "spot": data["_meta"]["spot"],
             "counts": data["_meta"]["counts"],
+            "ivStats30D": iv_stats,
         })
 
     # Write index manifest

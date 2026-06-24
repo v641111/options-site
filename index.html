@@ -132,26 +132,34 @@ tr.illiq .tk,tr.illiq .tk-name{color:var(--td)!important}
 .ec-chip .ec-days{opacity:.65;margin-left:4px;font-size:10px}
 .ec-chip.on .ec-days{opacity:1}
 
-/* ─── IV compare grid ─── */
+/* ─── IV compare grid (improved spacing + history) ─── */
 .iv-toolbar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:14px 18px;margin-bottom:16px}
-.iv-grid{background:var(--card);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;margin-bottom:24px}
-.iv-grid table{width:100%;border-collapse:collapse}
-.iv-grid th{background:rgba(0,0,0,.2);color:var(--td);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;padding:12px 14px;text-align:center;border-bottom:1px solid var(--bdr);position:sticky;top:60px}
-.iv-grid th:first-child{text-align:left}
-.iv-grid td{padding:13px 14px;border-bottom:1px solid rgba(22,29,42,.6);text-align:center;font-family:'Space Mono',monospace}
+.iv-grid{background:var(--card);border:1px solid var(--bdr);border-radius:12px;overflow:auto;margin-bottom:24px}
+.iv-grid table{width:100%;border-collapse:collapse;min-width:680px}
+.iv-grid th{background:rgba(0,0,0,.25);color:var(--td);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;padding:14px 16px;text-align:center;border-bottom:1px solid var(--bdr);white-space:nowrap}
+.iv-grid th:first-child{text-align:left;min-width:200px}
+.iv-grid th .th-mo{font-size:12px;font-weight:700;color:var(--t);display:block}
+.iv-grid th .th-days{font-size:9px;color:var(--td);font-weight:500;margin-top:3px;display:block}
+.iv-grid td{padding:18px 16px;border-bottom:1px solid rgba(22,29,42,.6);text-align:center;font-family:'Space Mono',monospace;vertical-align:middle;line-height:1.3}
 .iv-grid td:first-child{text-align:left}
 .iv-grid tr:last-child td{border-bottom:none}
 .iv-grid tr:hover td{background:rgba(13,17,23,.5)}
-.iv-name{font-weight:600;color:var(--t);font-family:'DM Sans',sans-serif;font-size:13px}
-.iv-name .sub{display:block;font-size:10px;color:var(--td);font-family:'Space Mono',monospace;margin-top:2px;font-weight:500}
-.iv-cell{font-size:14px;font-weight:700;padding:6px 10px;border-radius:6px;display:inline-block;min-width:60px}
+.iv-name{font-weight:600;color:var(--t);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.3}
+.iv-name .sub{display:block;font-size:10px;color:var(--td);font-family:'Space Mono',monospace;margin-top:3px;font-weight:500}
+.iv-cell-wrap{display:flex;flex-direction:column;align-items:center;gap:5px}
+.iv-cell{font-size:15px;font-weight:700;padding:6px 12px;border-radius:6px;display:inline-block;min-width:64px;line-height:1.2}
 .iv-cell.top{background:rgba(0,220,130,.18);color:var(--g);box-shadow:0 0 0 1px rgba(0,220,130,.25) inset}
 .iv-cell.high{color:var(--g)}
 .iv-cell.mid{color:var(--tm)}
 .iv-cell.low{color:var(--td)}
 .iv-cell.na{color:var(--td);opacity:.4}
-.iv-rank{display:inline-block;font-size:9px;color:var(--td);margin-left:4px;font-weight:600;font-family:'DM Sans',sans-serif}
-.iv-cell.top .iv-rank{color:var(--g)}
+.iv-meta{font-size:9px;color:var(--td);font-weight:500;line-height:1.3}
+.iv-meta .pct{font-family:'Space Mono',monospace;font-weight:700}
+.iv-meta .pct.hi{color:var(--g)}     /* high percentile = expensive option = good for selling */
+.iv-meta .pct.mid{color:var(--amb)}
+.iv-meta .pct.lo{color:var(--r)}
+.iv-meta .ki{color:var(--td);opacity:.7}
+.iv-strike{font-size:9px;color:var(--td);opacity:.65;font-family:'Space Mono',monospace}
 .iv-spot{font-family:'Space Mono',monospace;color:var(--tm);font-size:12px}
 .iv-load{text-align:center;padding:40px;color:var(--td)}
 
@@ -920,7 +928,8 @@ function setView(v) {
   document.getElementById('vtIv').classList.toggle('on', v === 'iv');
   document.getElementById('viewChain').classList.toggle('on', v === 'chain');
   document.getElementById('viewIV').classList.toggle('on', v === 'iv');
-  if (v === 'iv' && !state.ivLoaded) loadIvCompare();
+  // Always reload on switch — covers cases where first load had partial failures
+  if (v === 'iv') loadIvCompare(true);
 }
 
 // ══════════════════════════════════════════════════════════
@@ -948,17 +957,36 @@ async function loadIvCompare(force) {
   if (state.ivLoaded && !force) return renderIvCompare();
   const body = document.getElementById('ivBody');
   body.innerHTML = '<div class="iv-load"><span class="lspin"></span>加载 9 个标的数据...</div>';
-  try {
-    const results = await Promise.all(UNDERLYINGS.map(u =>
-      fetch(`/data/${u.code}.json?_=${Date.now()}`).then(r => r.ok ? r.json() : null).catch(() => null)
-    ));
-    state.ivData = {};
-    UNDERLYINGS.forEach((u, i) => { if (results[i]) state.ivData[u.code] = results[i]; });
-    state.ivLoaded = true;
-    renderIvCompare();
-  } catch(e) {
-    body.innerHTML = `<div class="iv-load" style="color:var(--r)">加载失败: ${e.message}</div>`;
+  const fetchOne = async (u, attempt) => {
+    try {
+      const r = await fetch(`/data/${u.code}.json?_=${Date.now()}_${attempt}`);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return await r.json();
+    } catch(e) {
+      // Single retry with extra delay
+      if (attempt < 2) {
+        await new Promise(s => setTimeout(s, 600));
+        return fetchOne(u, attempt + 1);
+      }
+      console.warn(`Failed to load ${u.code}:`, e.message);
+      return null;
+    }
+  };
+  const results = await Promise.all(UNDERLYINGS.map(u => fetchOne(u, 1)));
+  state.ivData = {};
+  let ok = 0;
+  UNDERLYINGS.forEach((u, i) => {
+    if (results[i]) { state.ivData[u.code] = results[i]; ok++; }
+  });
+  state.ivLoaded = true;
+  if (ok === 0) {
+    body.innerHTML = `<div class="iv-load" style="color:var(--r)">9 个标的全部加载失败</div>`;
+    return;
   }
+  if (ok < UNDERLYINGS.length) {
+    console.warn(`IV compare: ${ok}/${UNDERLYINGS.length} underlyings loaded`);
+  }
+  renderIvCompare();
 }
 
 function pickIvForExpiry(contracts, spot, expiryKey, type, strikeMode) {
@@ -999,17 +1027,24 @@ function renderIvCompare() {
     return;
   }
 
-  // For each (underlying, expiry) compute IV; track best per column
+  // For each (underlying, expiry) compute IV + history stats; track best per column
+  // ALWAYS render all 9 UNDERLYINGS rows (even if data missing — show "数据加载失败")
+  const ivTypeKey = state.ivType === 'P' ? 'put' : 'call';
   const rows = UNDERLYINGS.map(u => {
     const d = state.ivData[u.code];
-    if (!d) return null;
+    if (!d) {
+      return {u, spot: 0, cells: expiries.map(() => null), name: u.name, missing: true};
+    }
     const spot = d._meta.spot.price;
+    const ivStats = (d._meta && d._meta.ivStats30D) || {};
     const cells = expiries.map(([key, days]) => {
       const pick = pickIvForExpiry(d.contracts, spot, key, state.ivType, state.ivStrike);
-      return pick ? {iv: pick.iv, strike: pick.strike, name: pick.name, code: pick.code} : null;
+      if (!pick) return null;
+      const stats = (ivStats[key] && ivStats[key][ivTypeKey]) || null;
+      return {iv: pick.iv, strike: pick.strike, name: pick.name, code: pick.code, stats};
     });
-    return {u, spot, cells, name: d._meta.spot.name || u.name};
-  }).filter(Boolean);
+    return {u, spot, cells, name: d._meta.spot.name || u.name, missing: false};
+  });
 
   // Find max IV per column (for highlighting)
   const colMax = expiries.map((_, i) => {
@@ -1025,11 +1060,17 @@ function renderIvCompare() {
     <th>标的 / 现价</th>
     ${expiries.map(([key, days]) => {
       const mo = key.slice(5, 7) + '月';
-      return `<th>${mo}<div style="font-size:9px;color:var(--td);font-weight:500;margin-top:2px">${days}天</div></th>`;
+      return `<th><span class="th-mo">${mo}</span><span class="th-days">${days}天</span></th>`;
     }).join('')}
   </tr></thead><tbody>`;
 
   for (const r of rows) {
+    if (r.missing) {
+      html += `<tr><td><div class="iv-name">${r.name}<span class="sub">${r.u.code} · 数据未加载</span></div></td>`;
+      r.cells.forEach(() => { html += `<td><span class="iv-cell na">--</span></td>`; });
+      html += `</tr>`;
+      continue;
+    }
     html += `<tr><td><div class="iv-name">${r.name}<span class="sub">${r.u.code} · 现价 ${r.spot.toFixed(4)}</span></div></td>`;
     r.cells.forEach((cell, i) => {
       if (!cell) {
@@ -1039,8 +1080,21 @@ function renderIvCompare() {
       const ivPct = (cell.iv * 100).toFixed(1) + '%';
       const isTop = colMax[i] > 0 && Math.abs(cell.iv - colMax[i]) < 1e-6;
       const cls = isTop ? 'top' : (cell.iv >= 0.20 ? 'high' : cell.iv >= 0.12 ? 'mid' : 'low');
-      const krow = `<div style="font-size:9px;color:var(--td);margin-top:3px">K=${cell.strike.toFixed(3)}</div>`;
-      html += `<td><span class="iv-cell ${cls}">${ivPct}</span>${krow}</td>`;
+
+      // Historical IV: show 30D percentile / avg if available
+      // (Higher percentile = today's IV is unusually high → good for sell-side)
+      let metaLine = '';
+      if (cell.stats && cell.stats.count >= 5) {
+        const pct = cell.stats.percentile;
+        const avg = cell.stats.avg * 100;
+        const pctCls = pct >= 70 ? 'hi' : pct <= 30 ? 'lo' : 'mid';
+        const arrow = pct >= 70 ? '↑' : pct <= 30 ? '↓' : '→';
+        metaLine = `<div class="iv-meta"><span class="pct ${pctCls}">${arrow} ${pct.toFixed(0)}%ile</span> <span class="ki">30D avg ${avg.toFixed(1)}%</span></div>`;
+      } else if (cell.stats && cell.stats.count > 0) {
+        metaLine = `<div class="iv-meta"><span class="ki">历史累积中 (${cell.stats.count}天)</span></div>`;
+      }
+      const strikeLine = `<div class="iv-strike">K=${cell.strike.toFixed(3)}</div>`;
+      html += `<td><div class="iv-cell-wrap"><span class="iv-cell ${cls}">${ivPct}</span>${metaLine}${strikeLine}</div></td>`;
     });
     html += `</tr>`;
   }
