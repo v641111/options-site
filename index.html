@@ -117,6 +117,48 @@ tr.illiq .tk,tr.illiq .tk-name{color:var(--td)!important}
 .icard ul{padding-left:16px}.icard li{margin-bottom:3px}
 .icard b{color:var(--tm)}
 
+
+/* ─── View tabs & expiry chips ─── */
+.view-tabs{display:flex;gap:8px;margin-bottom:18px;border-bottom:1px solid var(--bdr);padding-bottom:0}
+.vt-btn{background:none;border:none;color:var(--tm);font-size:14px;font-weight:600;padding:10px 18px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;font-family:inherit}
+.vt-btn:hover{color:var(--t)}
+.vt-btn.on{color:var(--g);border-bottom-color:var(--g)}
+
+.expiry-chips{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center;padding:10px 0}
+.ec-lab{font-size:11px;color:var(--td);text-transform:uppercase;letter-spacing:.04em;margin-right:4px}
+.ec-chip{padding:5px 12px;border-radius:14px;border:1px solid var(--bdr);background:var(--bg);color:var(--tm);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'Space Mono',monospace}
+.ec-chip:hover{border-color:var(--g);color:var(--g)}
+.ec-chip.on{background:var(--g);color:var(--bg);border-color:var(--g)}
+.ec-chip .ec-days{opacity:.65;margin-left:4px;font-size:10px}
+.ec-chip.on .ec-days{opacity:1}
+
+/* ─── IV compare grid ─── */
+.iv-toolbar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:14px 18px;margin-bottom:16px}
+.iv-grid{background:var(--card);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;margin-bottom:24px}
+.iv-grid table{width:100%;border-collapse:collapse}
+.iv-grid th{background:rgba(0,0,0,.2);color:var(--td);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;padding:12px 14px;text-align:center;border-bottom:1px solid var(--bdr);position:sticky;top:60px}
+.iv-grid th:first-child{text-align:left}
+.iv-grid td{padding:13px 14px;border-bottom:1px solid rgba(22,29,42,.6);text-align:center;font-family:'Space Mono',monospace}
+.iv-grid td:first-child{text-align:left}
+.iv-grid tr:last-child td{border-bottom:none}
+.iv-grid tr:hover td{background:rgba(13,17,23,.5)}
+.iv-name{font-weight:600;color:var(--t);font-family:'DM Sans',sans-serif;font-size:13px}
+.iv-name .sub{display:block;font-size:10px;color:var(--td);font-family:'Space Mono',monospace;margin-top:2px;font-weight:500}
+.iv-cell{font-size:14px;font-weight:700;padding:6px 10px;border-radius:6px;display:inline-block;min-width:60px}
+.iv-cell.top{background:rgba(0,220,130,.18);color:var(--g);box-shadow:0 0 0 1px rgba(0,220,130,.25) inset}
+.iv-cell.high{color:var(--g)}
+.iv-cell.mid{color:var(--tm)}
+.iv-cell.low{color:var(--td)}
+.iv-cell.na{color:var(--td);opacity:.4}
+.iv-rank{display:inline-block;font-size:9px;color:var(--td);margin-left:4px;font-weight:600;font-family:'DM Sans',sans-serif}
+.iv-cell.top .iv-rank{color:var(--g)}
+.iv-spot{font-family:'Space Mono',monospace;color:var(--tm);font-size:12px}
+.iv-load{text-align:center;padding:40px;color:var(--td)}
+
+/* ─── view containers ─── */
+.view{display:none}
+.view.on{display:block}
+
 .disc{background:var(--card);border:1px solid #2a1c1c;border-radius:12px;padding:22px 26px;margin-bottom:40px}
 .disc h4{font-size:13px;font-weight:700;color:var(--amb);margin-bottom:8px}
 .disc p{font-size:12px;color:var(--td);line-height:1.7;margin-bottom:6px}
@@ -194,6 +236,13 @@ footer{border-top:1px solid var(--bdr);padding:30px 20px 22px;background:var(--b
   <p class="page-sub">9 只 ETF 期权全覆盖 · 实时年化 yield · 支持现金担保 / 交易所最低保证金两种模式</p>
 </div>
 
+<div class="view-tabs">
+  <button class="vt-btn on" id="vtChain" onclick="setView('chain')">📈 期权链</button>
+  <button class="vt-btn"    id="vtIv"    onclick="setView('iv')">🔥 IV 对比</button>
+</div>
+
+<div id="viewChain" class="view on">
+
 <!-- Status bar -->
 <div class="sbar">
   <span class="mkt-dot" id="mktDot"></span>
@@ -249,6 +298,11 @@ footer{border-top:1px solid var(--bdr);padding:30px 20px 22px;background:var(--b
 
 <span id="errBar" class="err-bar"></span>
 
+<div class="expiry-chips" id="expiryChips">
+  <span class="ec-lab">到期月份</span>
+  <span class="ec-chip on" data-expiry="all">全部</span>
+</div>
+
 <!-- Table -->
 <div class="tw"><table id="optTbl">
   <thead><tr>
@@ -298,8 +352,59 @@ footer{border-top:1px solid var(--bdr);padding:30px 20px 22px;background:var(--b
   <h4>⚠ 风险与免责</h4>
   <p>期权卖方面临<b>无限亏损风险</b>。本工具仅作收益率计算参考,不构成投资建议。</p>
   <p>交易所最低保证金会随标的价格波动每日盯市,标的剧烈下跌时需追加保证金,极端行情下可能被强平。新手建议从<b>现金担保模式</b>开始。</p>
-  <p>数据来源东方财富 push2 接口,有数秒至 1 分钟延迟,实际下单价格以交易系统为准。</p>
+  <p>数据来源新浪财经 + 东方财富, 数据每隔约 20-30 分钟由 GitHub Actions 定时刷新, 非真正实时。</p>
 </div>
+
+</div><!-- /viewChain -->
+
+<div id="viewIV" class="view">
+  <div class="iv-toolbar">
+    <div class="ctrl-grp">
+      <span class="ctrl-lab">类型</span>
+      <div class="cgroup">
+        <button class="cbtn on" id="ivPut"  onclick="setIvType('P')">认沽 IV</button>
+        <button class="cbtn"    id="ivCall" onclick="setIvType('C')">认购 IV</button>
+      </div>
+    </div>
+    <div class="ctrl-grp">
+      <span class="ctrl-lab">strike</span>
+      <div class="cgroup">
+        <button class="cbtn on" id="ivAtm" onclick="setIvStrike('atm')">平值 (ATM)</button>
+        <button class="cbtn"    id="ivOtm" onclick="setIvStrike('otm5')">虚值 5%</button>
+      </div>
+    </div>
+    <button class="rbtn" onclick="loadIvCompare(true)">
+      <span>↻</span> 重新加载
+    </button>
+  </div>
+  <div class="iv-grid">
+    <div id="ivBody"><div class="iv-load"><span class="lspin"></span>加载 9 个标的数据...</div></div>
+  </div>
+  <div class="cards">
+    <div class="icard">
+      <h3>怎么用这个 IV 对比</h3>
+      <p>同一到期月里, <b>IV 最高的 ETF</b> = 期权最贵 = 卖方拿到的权利金相对最丰厚。</p>
+      <p style="margin-top:8px">如果某个 ETF 的 IV 明显高于其他, 通常意味着市场预期它波动大 — 既是机会也是风险。</p>
+    </div>
+    <div class="icard">
+      <h3>ATM vs OTM 5%</h3>
+      <ul>
+        <li><b>平值 ATM</b>: 行权价最接近现价的合约, 时间价值最厚, 反映"基础 IV 水平"</li>
+        <li><b>虚值 5%</b>: 离现价 5% 的虚值合约, 反映"尾部风险溢价" (skew)</li>
+        <li>两者差异大 = IV smile 陡, 风险偏好失衡</li>
+      </ul>
+    </div>
+    <div class="icard">
+      <h3>颜色含义</h3>
+      <ul>
+        <li><span class="iv-cell top" style="font-size:11px;padding:2px 8px">绿色高亮</span> = 同一到期月里 IV 最高的标的</li>
+        <li>每行显示该 ETF 在不同到期月份的 IV 期限结构</li>
+        <li>同一 ETF 远月 IV 通常 ≥ 近月 (volatility term structure)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
 </div><!-- /wrap -->
 
 <footer><div class="fi">
@@ -747,6 +852,201 @@ function closeMdl(e) {
   document.body.style.overflow = '';
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMdl(); });
+
+// ══════════════════════════════════════════════════════════
+// EXPIRY FILTER (期权链 view)
+// ══════════════════════════════════════════════════════════
+state.expiryFilter = 'all';  // 'all' or YYYY-MM (e.g., '2026-06')
+
+function buildExpiryChips() {
+  const chipsEl = document.getElementById('expiryChips');
+  // unique expiries from raw contracts, sorted by days ascending
+  const uniq = new Map();
+  for (const c of state.rawContracts) {
+    if (c.type !== state.optType) continue;
+    if (!c.expiry) continue;
+    const key = c.expiry.slice(0, 7);  // YYYY-MM
+    if (!uniq.has(key)) uniq.set(key, {expiry: c.expiry, days: c.days, key});
+  }
+  const list = [...uniq.values()].sort((a, b) => a.days - b.days);
+  const labels = ['<span class="ec-lab">到期月份</span>',
+    `<span class="ec-chip${state.expiryFilter === 'all' ? ' on' : ''}" onclick="setExpiry('all')">全部</span>`,
+    ...list.map(e => {
+      const moStr = e.expiry.slice(5, 7) + '月';
+      const onCls = state.expiryFilter === e.key ? ' on' : '';
+      return `<span class="ec-chip${onCls}" onclick="setExpiry('${e.key}')">${moStr}<span class="ec-days">(${e.days}天)</span></span>`;
+    })
+  ];
+  chipsEl.innerHTML = labels.join('');
+}
+function setExpiry(key) {
+  state.expiryFilter = key;
+  buildExpiryChips();
+  recompute();
+}
+
+// Patch recompute to apply expiry filter
+const _origRecompute = recompute;
+recompute = function() {
+  const S = state.underPx;
+  state.rows = state.rawContracts
+    .filter(c => c.type === state.optType)
+    .filter(c => state.expiryFilter === 'all' || (c.expiry && c.expiry.startsWith(state.expiryFilter)))
+    .map(c => computeRow(c, S));
+  renderTable();
+};
+
+// Patch setOptType to rebuild chips
+const _origSetOptType = setOptType;
+setOptType = function(t) {
+  _origSetOptType(t);
+  buildExpiryChips();
+};
+
+// Patch doRefresh to build chips after data loads
+const _origDoRefresh = doRefresh;
+doRefresh = async function() {
+  await _origDoRefresh();
+  buildExpiryChips();
+};
+
+// ══════════════════════════════════════════════════════════
+// VIEW SWITCHING (Chain ↔ IV Compare)
+// ══════════════════════════════════════════════════════════
+state.view = 'chain';
+function setView(v) {
+  state.view = v;
+  document.getElementById('vtChain').classList.toggle('on', v === 'chain');
+  document.getElementById('vtIv').classList.toggle('on', v === 'iv');
+  document.getElementById('viewChain').classList.toggle('on', v === 'chain');
+  document.getElementById('viewIV').classList.toggle('on', v === 'iv');
+  if (v === 'iv' && !state.ivLoaded) loadIvCompare();
+}
+
+// ══════════════════════════════════════════════════════════
+// IV COMPARE (cross-ETF)
+// ══════════════════════════════════════════════════════════
+state.ivLoaded = false;
+state.ivData = {};            // code -> JSON
+state.ivType = 'P';            // 'P' or 'C'
+state.ivStrike = 'atm';        // 'atm' or 'otm5'
+
+function setIvType(t) {
+  state.ivType = t;
+  document.getElementById('ivPut').classList.toggle('on', t === 'P');
+  document.getElementById('ivCall').classList.toggle('on', t === 'C');
+  renderIvCompare();
+}
+function setIvStrike(s) {
+  state.ivStrike = s;
+  document.getElementById('ivAtm').classList.toggle('on', s === 'atm');
+  document.getElementById('ivOtm').classList.toggle('on', s === 'otm5');
+  renderIvCompare();
+}
+
+async function loadIvCompare(force) {
+  if (state.ivLoaded && !force) return renderIvCompare();
+  const body = document.getElementById('ivBody');
+  body.innerHTML = '<div class="iv-load"><span class="lspin"></span>加载 9 个标的数据...</div>';
+  try {
+    const results = await Promise.all(UNDERLYINGS.map(u =>
+      fetch(`/data/${u.code}.json?_=${Date.now()}`).then(r => r.ok ? r.json() : null).catch(() => null)
+    ));
+    state.ivData = {};
+    UNDERLYINGS.forEach((u, i) => { if (results[i]) state.ivData[u.code] = results[i]; });
+    state.ivLoaded = true;
+    renderIvCompare();
+  } catch(e) {
+    body.innerHTML = `<div class="iv-load" style="color:var(--r)">加载失败: ${e.message}</div>`;
+  }
+}
+
+function pickIvForExpiry(contracts, spot, expiryKey, type, strikeMode) {
+  // Pick the contract for given expiry month + type + strike preference
+  const candidates = contracts.filter(c =>
+    c.type === type && c.expiry && c.expiry.startsWith(expiryKey) && c.iv !== null && c.iv !== undefined && !c.illiq
+  );
+  if (!candidates.length) return null;
+  let targetStrike;
+  if (strikeMode === 'atm') {
+    targetStrike = spot;
+  } else {  // otm5
+    // OTM 5% means: for put, strike 5% below spot; for call, strike 5% above
+    targetStrike = type === 'P' ? spot * 0.95 : spot * 1.05;
+  }
+  candidates.sort((a, b) => Math.abs(a.strike - targetStrike) - Math.abs(b.strike - targetStrike));
+  return candidates[0];
+}
+
+function renderIvCompare() {
+  const body = document.getElementById('ivBody');
+  if (!state.ivLoaded) return;
+
+  // Collect all unique expiry months across all underlyings
+  const exMap = new Map();
+  for (const code in state.ivData) {
+    const d = state.ivData[code];
+    for (const c of (d.contracts || [])) {
+      if (c.type !== state.ivType || !c.expiry) continue;
+      const key = c.expiry.slice(0, 7);
+      if (!exMap.has(key)) exMap.set(key, c.days);
+    }
+  }
+  const expiries = [...exMap.entries()].sort((a, b) => a[1] - b[1]);
+
+  if (!expiries.length) {
+    body.innerHTML = '<div class="iv-load">无可用数据</div>';
+    return;
+  }
+
+  // For each (underlying, expiry) compute IV; track best per column
+  const rows = UNDERLYINGS.map(u => {
+    const d = state.ivData[u.code];
+    if (!d) return null;
+    const spot = d._meta.spot.price;
+    const cells = expiries.map(([key, days]) => {
+      const pick = pickIvForExpiry(d.contracts, spot, key, state.ivType, state.ivStrike);
+      return pick ? {iv: pick.iv, strike: pick.strike, name: pick.name, code: pick.code} : null;
+    });
+    return {u, spot, cells, name: d._meta.spot.name || u.name};
+  }).filter(Boolean);
+
+  // Find max IV per column (for highlighting)
+  const colMax = expiries.map((_, i) => {
+    let max = 0;
+    for (const r of rows) {
+      if (r.cells[i] && r.cells[i].iv > max) max = r.cells[i].iv;
+    }
+    return max;
+  });
+
+  // Render
+  let html = `<table><thead><tr>
+    <th>标的 / 现价</th>
+    ${expiries.map(([key, days]) => {
+      const mo = key.slice(5, 7) + '月';
+      return `<th>${mo}<div style="font-size:9px;color:var(--td);font-weight:500;margin-top:2px">${days}天</div></th>`;
+    }).join('')}
+  </tr></thead><tbody>`;
+
+  for (const r of rows) {
+    html += `<tr><td><div class="iv-name">${r.name}<span class="sub">${r.u.code} · 现价 ${r.spot.toFixed(4)}</span></div></td>`;
+    r.cells.forEach((cell, i) => {
+      if (!cell) {
+        html += `<td><span class="iv-cell na">--</span></td>`;
+        return;
+      }
+      const ivPct = (cell.iv * 100).toFixed(1) + '%';
+      const isTop = colMax[i] > 0 && Math.abs(cell.iv - colMax[i]) < 1e-6;
+      const cls = isTop ? 'top' : (cell.iv >= 0.20 ? 'high' : cell.iv >= 0.12 ? 'mid' : 'low');
+      const krow = `<div style="font-size:9px;color:var(--td);margin-top:3px">K=${cell.strike.toFixed(3)}</div>`;
+      html += `<td><span class="iv-cell ${cls}">${ivPct}</span>${krow}</td>`;
+    });
+    html += `</tr>`;
+  }
+  html += `</tbody></table>`;
+  body.innerHTML = html;
+}
 
 // ══════════════════════════════════════════════════════════
 // INIT
