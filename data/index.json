@@ -1,176 +1,89 @@
 {
-  "updated": "2026-07-03T18:10:27+08:00",
+  "updated": "2026-07-06T14:09:00+08:00",
   "underlyings": [
-    {
-      "code": "510050",
-      "name": "上证50ETF华夏",
-      "short": "50ETF",
-      "secid": "1.510050",
-      "spot": {
-        "price": 3.023,
-        "prevClose": 3.003,
-        "open": 3.003,
-        "high": 3.048,
-        "low": 3.003,
-        "name": "上证50ETF华夏"
-      },
-      "counts": {
-        "total": 96,
-        "calls": 48,
-        "puts": 48,
-        "iv_computed": 91,
-        "illiquid": 0
-      },
-      "ivStats30D": {
-        "2026-12": {
-          "put": {
-            "avg": 0.24510000000000004,
-            "min": 0.2267,
-            "max": 0.256,
-            "percentile": 37.5,
-            "count": 8
-          },
-          "call": {
-            "avg": 0.1774625,
-            "min": 0.169,
-            "max": 0.1881,
-            "percentile": 37.5,
-            "count": 8
-          }
-        },
-        "2026-09": {
-          "put": {
-            "avg": 0.246075,
-            "min": 0.229,
-            "max": 0.2606,
-            "percentile": 25.0,
-            "count": 8
-          },
-          "call": {
-            "avg": 0.1897375,
-            "min": 0.1792,
-            "max": 0.2037,
-            "percentile": 37.5,
-            "count": 8
-          }
-        },
-        "2026-08": {
-          "put": {
-            "avg": 0.2319,
-            "min": 0.2162,
-            "max": 0.2492,
-            "percentile": 14.285714285714285,
-            "count": 7
-          },
-          "call": {
-            "avg": 0.1831428571428571,
-            "min": 0.1734,
-            "max": 0.2015,
-            "percentile": 42.857142857142854,
-            "count": 7
-          }
-        },
-        "2026-07": {
-          "put": {
-            "avg": 0.223375,
-            "min": 0.1996,
-            "max": 0.253,
-            "percentile": 25.0,
-            "count": 8
-          },
-          "call": {
-            "avg": 0.1809375,
-            "min": 0.1639,
-            "max": 0.2079,
-            "percentile": 25.0,
-            "count": 8
-          }
-        }
-      }
-    },
     {
       "code": "510300",
       "name": "沪深300ETF华泰柏瑞",
       "short": "300ETF沪",
       "secid": "1.510300",
       "spot": {
-        "price": 4.876,
-        "prevClose": 4.85,
-        "open": 4.83,
-        "high": 4.927,
-        "low": 4.828,
+        "price": 4.894,
+        "prevClose": 4.876,
+        "open": 4.9,
+        "high": 4.914,
+        "low": 4.831,
         "name": "沪深300ETF华泰柏瑞"
       },
       "counts": {
         "total": 98,
         "calls": 49,
         "puts": 49,
-        "iv_computed": 88,
+        "iv_computed": 86,
         "illiquid": 0
       },
       "ivStats30D": {
         "2026-09": {
           "put": {
-            "avg": 0.277825,
+            "avg": 0.2765888888888889,
             "min": 0.2638,
             "max": 0.2928,
-            "percentile": 0.0,
-            "count": 8
+            "percentile": 22.22222222222222,
+            "count": 9
           },
           "call": {
-            "avg": 0.1853125,
+            "avg": 0.18593333333333334,
             "min": 0.1739,
             "max": 0.1978,
-            "percentile": 75.0,
-            "count": 8
+            "percentile": 55.55555555555556,
+            "count": 9
           }
         },
         "2026-12": {
           "put": {
-            "avg": 0.2882875,
+            "avg": 0.2877111111111111,
             "min": 0.2733,
             "max": 0.3006,
-            "percentile": 25.0,
-            "count": 8
+            "percentile": 33.33333333333333,
+            "count": 9
           },
           "call": {
-            "avg": 0.163125,
+            "avg": 0.1633,
             "min": 0.1546,
             "max": 0.1713,
-            "percentile": 75.0,
-            "count": 8
+            "percentile": 55.55555555555556,
+            "count": 9
           }
         },
         "2026-08": {
           "put": {
-            "avg": 0.2585571428571429,
+            "avg": 0.2566625,
             "min": 0.2411,
             "max": 0.2701,
-            "percentile": 0.0,
-            "count": 7
+            "percentile": 25.0,
+            "count": 8
           },
           "call": {
-            "avg": 0.18245714285714287,
+            "avg": 0.18270000000000003,
             "min": 0.17,
             "max": 0.1971,
-            "percentile": 71.42857142857143,
-            "count": 7
+            "percentile": 37.5,
+            "count": 8
           }
         },
         "2026-07": {
           "put": {
-            "avg": 0.2398875,
+            "avg": 0.23860000000000003,
             "min": 0.2191,
             "max": 0.2563,
-            "percentile": 0.0,
-            "count": 8
+            "percentile": 22.22222222222222,
+            "count": 9
           },
           "call": {
-            "avg": 0.1837625,
+            "avg": 0.1846,
             "min": 0.161,
             "max": 0.2068,
-            "percentile": 75.0,
-            "count": 8
+            "percentile": 66.66666666666666,
+            "count": 9
           }
         }
       }
@@ -181,11 +94,11 @@
       "short": "500ETF沪",
       "secid": "1.510500",
       "spot": {
-        "price": 8.901,
-        "prevClose": 8.849,
-        "open": 8.798,
-        "high": 9.014,
-        "low": 8.79,
+        "price": 8.854,
+        "prevClose": 8.901,
+        "open": 8.93,
+        "high": 8.966,
+        "low": 8.727,
         "name": "中证500ETF南方"
       },
       "counts": {
@@ -198,153 +111,66 @@
       "ivStats30D": {
         "2026-09": {
           "put": {
-            "avg": 0.3429,
-            "min": 0.3291,
+            "avg": 0.3411222222222222,
+            "min": 0.3269,
             "max": 0.3629,
             "percentile": 0.0,
-            "count": 8
+            "count": 9
           },
           "call": {
-            "avg": 0.19265000000000002,
+            "avg": 0.1926777777777778,
             "min": 0.1785,
             "max": 0.2048,
-            "percentile": 87.5,
-            "count": 8
+            "percentile": 44.44444444444444,
+            "count": 9
           }
         },
         "2026-12": {
           "put": {
-            "avg": 0.3585,
+            "avg": 0.35779999999999995,
             "min": 0.3482,
             "max": 0.3746,
-            "percentile": 12.5,
-            "count": 8
+            "percentile": 33.33333333333333,
+            "count": 9
           },
           "call": {
-            "avg": 0.1664,
+            "avg": 0.16656666666666664,
             "min": 0.1531,
             "max": 0.1779,
-            "percentile": 75.0,
-            "count": 8
+            "percentile": 55.55555555555556,
+            "count": 9
           }
         },
         "2026-08": {
           "put": {
-            "avg": 0.3243142857142857,
+            "avg": 0.3222625,
             "min": 0.3067,
             "max": 0.3439,
-            "percentile": 0.0,
-            "count": 7
+            "percentile": 25.0,
+            "count": 8
           },
           "call": {
-            "avg": 0.19960000000000003,
+            "avg": 0.19988750000000002,
             "min": 0.184,
             "max": 0.2118,
-            "percentile": 85.71428571428571,
-            "count": 7
+            "percentile": 50.0,
+            "count": 8
           }
         },
         "2026-07": {
           "put": {
-            "avg": 0.31245,
-            "min": 0.2916,
+            "avg": 0.30996666666666667,
+            "min": 0.2901,
             "max": 0.3469,
             "percentile": 0.0,
-            "count": 8
+            "count": 9
           },
           "call": {
-            "avg": 0.20779999999999998,
+            "avg": 0.20898888888888886,
             "min": 0.1871,
             "max": 0.2287,
-            "percentile": 75.0,
-            "count": 8
-          }
-        }
-      }
-    },
-    {
-      "code": "588000",
-      "name": "科创50ETF华夏",
-      "short": "科创50华夏",
-      "secid": "1.588000",
-      "spot": {
-        "price": 2.102,
-        "prevClose": 2.119,
-        "open": 2.089,
-        "high": 2.165,
-        "low": 2.068,
-        "name": "科创50ETF华夏"
-      },
-      "counts": {
-        "total": 184,
-        "calls": 92,
-        "puts": 92,
-        "iv_computed": 157,
-        "illiquid": 0
-      },
-      "ivStats30D": {
-        "2026-12": {
-          "put": {
-            "avg": 0.6525624999999999,
-            "min": 0.6183,
-            "max": 0.6934,
-            "percentile": 0.0,
-            "count": 8
-          },
-          "call": {
-            "avg": 0.3873875,
-            "min": 0.3417,
-            "max": 0.4278,
-            "percentile": 62.5,
-            "count": 8
-          }
-        },
-        "2026-09": {
-          "put": {
-            "avg": 0.6769875000000001,
-            "min": 0.6325,
-            "max": 0.7271,
-            "percentile": 0.0,
-            "count": 8
-          },
-          "call": {
-            "avg": 0.4356,
-            "min": 0.3788,
-            "max": 0.4793,
-            "percentile": 50.0,
-            "count": 8
-          }
-        },
-        "2026-07": {
-          "put": {
-            "avg": 0.6759375000000001,
-            "min": 0.5938,
-            "max": 0.7644,
-            "percentile": 0.0,
-            "count": 8
-          },
-          "call": {
-            "avg": 0.495075,
-            "min": 0.4254,
-            "max": 0.5506,
-            "percentile": 50.0,
-            "count": 8
-          }
-        },
-        "2026-08": {
-          "put": {
-            "avg": 0.6700857142857143,
-            "min": 0.6012,
-            "max": 0.7272,
-            "percentile": 0.0,
-            "count": 7
-          },
-          "call": {
-            "avg": 0.47339999999999993,
-            "min": 0.4392,
-            "max": 0.5141,
-            "percentile": 42.857142857142854,
-            "count": 7
+            "percentile": 77.77777777777779,
+            "count": 9
           }
         }
       }
@@ -355,83 +181,83 @@
       "short": "科创50易",
       "secid": "1.588080",
       "spot": {
-        "price": 2.037,
-        "prevClose": 2.048,
-        "open": 2.025,
-        "high": 2.102,
-        "low": 2.008,
+        "price": 2.067,
+        "prevClose": 2.037,
+        "open": 2.065,
+        "high": 2.082,
+        "low": 1.97,
         "name": "科创50ETF易方达"
       },
       "counts": {
         "total": 174,
         "calls": 87,
         "puts": 87,
-        "iv_computed": 149,
+        "iv_computed": 144,
         "illiquid": 0
       },
       "ivStats30D": {
         "2026-12": {
           "put": {
-            "avg": 0.6589625,
-            "min": 0.6133,
+            "avg": 0.6526666666666666,
+            "min": 0.6023,
             "max": 0.7053,
-            "percentile": 12.5,
-            "count": 8
+            "percentile": 0.0,
+            "count": 9
           },
           "call": {
-            "avg": 0.3900125,
+            "avg": 0.38753333333333334,
             "min": 0.3459,
             "max": 0.4315,
-            "percentile": 62.5,
-            "count": 8
+            "percentile": 11.11111111111111,
+            "count": 9
           }
         },
         "2026-09": {
           "put": {
-            "avg": 0.6833875,
-            "min": 0.6337,
+            "avg": 0.6745111111111112,
+            "min": 0.6035,
             "max": 0.7347,
             "percentile": 0.0,
-            "count": 8
+            "count": 9
           },
           "call": {
-            "avg": 0.442825,
+            "avg": 0.4398777777777778,
             "min": 0.3912,
             "max": 0.4889,
-            "percentile": 50.0,
-            "count": 8
+            "percentile": 22.22222222222222,
+            "count": 9
           }
         },
         "2026-07": {
           "put": {
-            "avg": 0.6825375,
+            "avg": 0.6725444444444445,
             "min": 0.5771,
             "max": 0.7679,
-            "percentile": 0.0,
-            "count": 8
+            "percentile": 11.11111111111111,
+            "count": 9
           },
           "call": {
-            "avg": 0.491075,
+            "avg": 0.49137777777777775,
             "min": 0.4135,
             "max": 0.5816,
-            "percentile": 50.0,
-            "count": 8
+            "percentile": 44.44444444444444,
+            "count": 9
           }
         },
         "2026-08": {
           "put": {
-            "avg": 0.6782714285714285,
-            "min": 0.6007,
+            "avg": 0.6669124999999999,
+            "min": 0.5874,
             "max": 0.732,
             "percentile": 0.0,
-            "count": 7
+            "count": 8
           },
           "call": {
-            "avg": 0.46534285714285717,
+            "avg": 0.46225,
             "min": 0.4173,
             "max": 0.524,
-            "percentile": 42.857142857142854,
-            "count": 7
+            "percentile": 25.0,
+            "count": 8
           }
         }
       }
@@ -442,83 +268,83 @@
       "short": "深100ETF",
       "secid": "0.159901",
       "spot": {
-        "price": 3.966,
-        "prevClose": 3.922,
-        "open": 3.904,
-        "high": 4.026,
-        "low": 3.904,
+        "price": 3.952,
+        "prevClose": 3.966,
+        "open": 3.981,
+        "high": 4.0,
+        "low": 3.891,
         "name": "深100ETF"
       },
       "counts": {
         "total": 110,
         "calls": 55,
         "puts": 55,
-        "iv_computed": 101,
+        "iv_computed": 102,
         "illiquid": 0
       },
       "ivStats30D": {
         "2026-12": {
           "put": {
-            "avg": 0.379575,
+            "avg": 0.37855555555555553,
             "min": 0.3656,
             "max": 0.388,
-            "percentile": 0.0,
-            "count": 8
+            "percentile": 11.11111111111111,
+            "count": 9
           },
           "call": {
-            "avg": 0.24475,
+            "avg": 0.2449777777777778,
             "min": 0.223,
             "max": 0.2547,
-            "percentile": 12.5,
-            "count": 8
+            "percentile": 33.33333333333333,
+            "count": 9
           }
         },
         "2026-09": {
           "put": {
-            "avg": 0.36760000000000004,
+            "avg": 0.3666777777777778,
             "min": 0.3549,
             "max": 0.3741,
-            "percentile": 37.5,
-            "count": 8
+            "percentile": 11.11111111111111,
+            "count": 9
           },
           "call": {
-            "avg": 0.2657625,
+            "avg": 0.2667888888888889,
             "min": 0.2463,
             "max": 0.2842,
-            "percentile": 37.5,
-            "count": 8
+            "percentile": 66.66666666666666,
+            "count": 9
           }
         },
         "2026-08": {
           "put": {
-            "avg": 0.35130000000000006,
-            "min": 0.3419,
+            "avg": 0.34990000000000004,
+            "min": 0.3401,
             "max": 0.3574,
-            "percentile": 14.285714285714285,
-            "count": 7
+            "percentile": 0.0,
+            "count": 8
           },
           "call": {
-            "avg": 0.26704285714285714,
+            "avg": 0.267225,
             "min": 0.2496,
             "max": 0.2848,
-            "percentile": 28.57142857142857,
-            "count": 7
+            "percentile": 62.5,
+            "count": 8
           }
         },
         "2026-07": {
           "put": {
-            "avg": 0.33934999999999993,
+            "avg": 0.33917777777777774,
             "min": 0.3288,
             "max": 0.3495,
-            "percentile": 62.5,
-            "count": 8
+            "percentile": 33.33333333333333,
+            "count": 9
           },
           "call": {
-            "avg": 0.2770625,
+            "avg": 0.2778222222222222,
             "min": 0.2433,
             "max": 0.3228,
-            "percentile": 37.5,
-            "count": 8
+            "percentile": 55.55555555555556,
+            "count": 9
           }
         }
       }
@@ -529,169 +355,82 @@
       "short": "创业板ETF",
       "secid": "0.159915",
       "spot": {
-        "price": 4.037,
-        "prevClose": 4.036,
-        "open": 4.002,
-        "high": 4.13,
-        "low": 4.0,
+        "price": 3.983,
+        "prevClose": 4.037,
+        "open": 4.051,
+        "high": 4.077,
+        "low": 3.918,
         "name": "创业板"
       },
       "counts": {
         "total": 134,
         "calls": 67,
         "puts": 67,
-        "iv_computed": 124,
+        "iv_computed": 125,
         "illiquid": 0
       },
       "ivStats30D": {
         "2026-12": {
           "put": {
-            "avg": 0.4805875,
-            "min": 0.4615,
+            "avg": 0.47831111111111113,
+            "min": 0.4601,
             "max": 0.4958,
-            "percentile": 37.5,
-            "count": 8
+            "percentile": 0.0,
+            "count": 9
           },
           "call": {
-            "avg": 0.3198875,
-            "min": 0.3166,
+            "avg": 0.31847777777777775,
+            "min": 0.3072,
             "max": 0.3246,
-            "percentile": 12.5,
-            "count": 8
+            "percentile": 0.0,
+            "count": 9
           }
         },
         "2026-09": {
           "put": {
-            "avg": 0.47877500000000006,
-            "min": 0.462,
+            "avg": 0.4758333333333334,
+            "min": 0.4523,
             "max": 0.4944,
-            "percentile": 12.5,
-            "count": 8
+            "percentile": 0.0,
+            "count": 9
           },
           "call": {
-            "avg": 0.348,
-            "min": 0.3413,
+            "avg": 0.3468,
+            "min": 0.3372,
             "max": 0.3673,
-            "percentile": 75.0,
-            "count": 8
+            "percentile": 0.0,
+            "count": 9
           }
         },
         "2026-07": {
           "put": {
-            "avg": 0.4549625,
-            "min": 0.4223,
+            "avg": 0.45091111111111115,
+            "min": 0.4185,
             "max": 0.4771,
             "percentile": 0.0,
-            "count": 8
+            "count": 9
           },
           "call": {
-            "avg": 0.3899875,
+            "avg": 0.3896777777777778,
             "min": 0.3661,
             "max": 0.4215,
-            "percentile": 37.5,
-            "count": 8
+            "percentile": 44.44444444444444,
+            "count": 9
           }
         },
         "2026-08": {
           "put": {
-            "avg": 0.46855714285714284,
-            "min": 0.4469,
+            "avg": 0.463775,
+            "min": 0.4303,
             "max": 0.4811,
             "percentile": 0.0,
-            "count": 7
+            "count": 8
           },
           "call": {
-            "avg": 0.3683714285714285,
-            "min": 0.3581,
+            "avg": 0.36692499999999995,
+            "min": 0.3568,
             "max": 0.3825,
-            "percentile": 28.57142857142857,
-            "count": 7
-          }
-        }
-      }
-    },
-    {
-      "code": "159919",
-      "name": "沪深300ETF嘉实",
-      "short": "300ETF深",
-      "secid": "0.159919",
-      "spot": {
-        "price": 5.088,
-        "prevClose": 5.061,
-        "open": 5.05,
-        "high": 5.141,
-        "low": 5.039,
-        "name": "沪深300"
-      },
-      "counts": {
-        "total": 92,
-        "calls": 46,
-        "puts": 46,
-        "iv_computed": 81,
-        "illiquid": 0
-      },
-      "ivStats30D": {
-        "2026-09": {
-          "put": {
-            "avg": 0.2782875,
-            "min": 0.2613,
-            "max": 0.2948,
             "percentile": 0.0,
-            "count": 8
-          },
-          "call": {
-            "avg": 0.186725,
-            "min": 0.1779,
-            "max": 0.1992,
-            "percentile": 62.5,
-            "count": 8
-          }
-        },
-        "2026-12": {
-          "put": {
-            "avg": 0.2854125,
-            "min": 0.2727,
-            "max": 0.297,
-            "percentile": 0.0,
-            "count": 8
-          },
-          "call": {
-            "avg": 0.161775,
-            "min": 0.1565,
-            "max": 0.1742,
-            "percentile": 50.0,
-            "count": 8
-          }
-        },
-        "2026-08": {
-          "put": {
-            "avg": 0.26044285714285714,
-            "min": 0.2411,
-            "max": 0.2749,
-            "percentile": 0.0,
-            "count": 7
-          },
-          "call": {
-            "avg": 0.18137142857142857,
-            "min": 0.1734,
-            "max": 0.2,
-            "percentile": 71.42857142857143,
-            "count": 7
-          }
-        },
-        "2026-07": {
-          "put": {
-            "avg": 0.2463875,
-            "min": 0.2216,
-            "max": 0.2664,
-            "percentile": 0.0,
-            "count": 8
-          },
-          "call": {
-            "avg": 0.18446250000000003,
-            "min": 0.1677,
-            "max": 0.2088,
-            "percentile": 62.5,
             "count": 8
           }
         }
@@ -703,82 +442,82 @@
       "short": "500ETF深",
       "secid": "0.159922",
       "spot": {
-        "price": 3.54,
-        "prevClose": 3.52,
-        "open": 3.51,
-        "high": 3.584,
-        "low": 3.498,
+        "price": 3.517,
+        "prevClose": 3.54,
+        "open": 3.546,
+        "high": 3.568,
+        "low": 3.471,
         "name": "500ETF"
       },
       "counts": {
         "total": 110,
         "calls": 55,
         "puts": 55,
-        "iv_computed": 90,
+        "iv_computed": 91,
         "illiquid": 0
       },
       "ivStats30D": {
         "2026-09": {
           "put": {
-            "avg": 0.3437375,
+            "avg": 0.3420333333333333,
             "min": 0.3238,
             "max": 0.3653,
-            "percentile": 0.0,
-            "count": 8
+            "percentile": 11.11111111111111,
+            "count": 9
           },
           "call": {
-            "avg": 0.19455,
+            "avg": 0.19524444444444444,
             "min": 0.1857,
             "max": 0.2055,
-            "percentile": 50.0,
-            "count": 8
+            "percentile": 66.66666666666666,
+            "count": 9
           }
         },
         "2026-12": {
           "put": {
-            "avg": 0.3623375,
+            "avg": 0.3614888888888889,
             "min": 0.3476,
             "max": 0.3785,
-            "percentile": 0.0,
-            "count": 8
+            "percentile": 33.33333333333333,
+            "count": 9
           },
           "call": {
-            "avg": 0.16970000000000002,
+            "avg": 0.1702888888888889,
             "min": 0.1637,
             "max": 0.1797,
-            "percentile": 25.0,
-            "count": 8
-          }
-        },
-        "2026-08": {
-          "put": {
-            "avg": 0.3258571428571429,
-            "min": 0.2982,
-            "max": 0.3513,
-            "percentile": 0.0,
-            "count": 7
-          },
-          "call": {
-            "avg": 0.20258571428571429,
-            "min": 0.1877,
-            "max": 0.2149,
-            "percentile": 28.57142857142857,
-            "count": 7
+            "percentile": 77.77777777777779,
+            "count": 9
           }
         },
         "2026-07": {
           "put": {
-            "avg": 0.3115375,
+            "avg": 0.30870000000000003,
             "min": 0.2807,
             "max": 0.3469,
-            "percentile": 0.0,
+            "percentile": 11.11111111111111,
+            "count": 9
+          },
+          "call": {
+            "avg": 0.2149333333333333,
+            "min": 0.1918,
+            "max": 0.2369,
+            "percentile": 77.77777777777779,
+            "count": 9
+          }
+        },
+        "2026-08": {
+          "put": {
+            "avg": 0.32353750000000003,
+            "min": 0.2982,
+            "max": 0.3513,
+            "percentile": 12.5,
             "count": 8
           },
           "call": {
-            "avg": 0.2125375,
-            "min": 0.1918,
-            "max": 0.2369,
-            "percentile": 62.5,
+            "avg": 0.203625,
+            "min": 0.1877,
+            "max": 0.2149,
+            "percentile": 75.0,
             "count": 8
           }
         }
