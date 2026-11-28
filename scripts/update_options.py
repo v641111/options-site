@@ -180,8 +180,12 @@ def parse_so(parts):
     """Parse CON_SO_<code> response: Greeks."""
     try:
         def f(i):
+            # Sina sometimes returns "nan"; NaN is invalid JSON and breaks the
+            # browser's JSON.parse for the whole file.
             if i < len(parts) and parts[i]:
-                try: return float(parts[i])
+                try:
+                    v = float(parts[i])
+                    return v if math.isfinite(v) else None
                 except: return None
             return None
         return {
@@ -364,6 +368,34 @@ def compute_atm_iv_per_expiry(contracts, spot):
     return result
 
 
+def trade_date_of(contracts):
+    """Trading date the quotes belong to (max quoteTime date). Robust to
+    weekend / overnight / holiday runs, which would otherwise log stale data
+    under a non-trading date."""
+    ds = [c.get("quoteTime", "")[:10] for c in contracts if c.get("quoteTime")]
+    ds = [d for d in ds if re.match(r"\d{4}-\d{2}-\d{2}$", d)]
+    if ds:
+        return max(ds)
+    d = datetime.now(BJ).date()
+    while d.weekday() >= 5:
+        d -= timedelta(days=1)
+    return d.isoformat()
+
+
+def constant_maturity_series(hist, min_days=15):
+    """Per date, ATM IV of the nearest expiry with >= min_days left.
+    Returns [[date, put_iv, call_iv], ...] ascending."""
+    out = []
+    for d in sorted(hist):
+        snap = hist[d] or {}
+        cands = [v for v in snap.values() if v and (v.get("days") or 0) >= min_days]
+        if not cands:
+            continue
+        v = min(cands, key=lambda x: x["days"])
+        out.append([d, v.get("put"), v.get("call")])
+    return out
+
+
 def update_history(under_code, atm_iv_today, today_str):
     """Append today's snapshot to history file. Keep last N days."""
     HISTORY_DIR.mkdir(parents=True, exist_ok=True)
@@ -375,8 +407,14 @@ def update_history(under_code, atm_iv_today, today_str):
             hist = {}
     else:
         hist = {}
-    # Overwrite/insert today
+    # Overwrite/insert today; drop weekend keys written by stale runs
     hist[today_str] = atm_iv_today
+    for k in list(hist.keys()):
+        try:
+            if datetime.strptime(k, "%Y-%m-%d").weekday() >= 5:
+                hist.pop(k)
+        except Exception:
+            hist.pop(k, None)
     # Keep only last HISTORY_KEEP_DAYS dates
     keys_sorted = sorted(hist.keys(), reverse=True)
     if len(keys_sorted) > HISTORY_KEEP_DAYS:
@@ -386,10 +424,10 @@ def update_history(under_code, atm_iv_today, today_str):
     return hist
 
 
-def compute_iv_stats(hist, expiry_key, opt_type, days=30):
+def compute_iv_stats(hist, expiry_key, opt_type, days=30, today_str=None):
     """Given history dict, expiry month key (YYYY-MM), opt_type ('put'/'call'),
     return {avg, min, max, percentile, count} over last N days."""
-    today = datetime.now(BJ).date()
+    today = datetime.strptime(today_str, "%Y-%m-%d").date() if today_str else datetime.now(BJ).date()
     cutoff = today - timedelta(days=days)
     vals = []
     for date_str, snap in hist.items():
@@ -427,16 +465,36 @@ def compute_iv_stats(hist, expiry_key, opt_type, days=30):
     }
 
 
+def clean_nan(o):
+    """Replace any non-finite float with None so output is strict JSON."""
+    if isinstance(o, float):
+        return o if math.isfinite(o) else None
+    if isinstance(o, dict):
+        return {k: clean_nan(v) for k, v in o.items()}
+    if isinstance(o, list):
+        return [clean_nan(v) for v in o]
+    return o
+
+
 # ─── Main ──────────────────────────────────────────────────
 def main():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     index_meta = []
-    today_str = datetime.now(BJ).date().isoformat()
-
     for under in UNDERLYINGS:
-        data = scrape_underlying(under)
+        data = None
+        for attempt in range(2):
+            try:
+                data = scrape_underlying(under)
+            except Exception as e:
+                print(f"  scrape ERR: {e}")
+                data = None
+            if data and data["contracts"]:
+                break
+            time.sleep(2)
         if not data:
             continue
+        today_str = trade_date_of(data["contracts"])
+        data["_meta"]["tradeDate"] = today_str
 
         # Historical IV snapshot
         spot = data["_meta"]["spot"]["price"]
@@ -448,14 +506,14 @@ def main():
         iv_stats = {}  # expiry_key -> {put: {...}, call: {...}}
         for exp_key in atm_iv_today.keys():
             iv_stats[exp_key] = {
-                "put":  compute_iv_stats(hist, exp_key, "put",  days=30),
-                "call": compute_iv_stats(hist, exp_key, "call", days=30),
+                "put":  compute_iv_stats(hist, exp_key, "put",  days=30, today_str=today_str),
+                "call": compute_iv_stats(hist, exp_key, "call", days=30, today_str=today_str),
             }
         data["_meta"]["ivStats30D"] = iv_stats
         data["_meta"]["ivToday"] = atm_iv_today
 
         out_path = OUT_DIR / f"{under['code']}.json"
-        out_path.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+        out_path.write_text(json.dumps(clean_nan(data), ensure_ascii=False, separators=(",", ":"), allow_nan=False), encoding="utf-8")
         print(f"  -> {out_path.name} ({out_path.stat().st_size} bytes)  history: {len(hist)} days")
         index_meta.append({
             "code": under["code"],
@@ -465,15 +523,18 @@ def main():
             "spot": data["_meta"]["spot"],
             "counts": data["_meta"]["counts"],
             "ivStats30D": iv_stats,
+            "tradeDate": today_str,
+            "updated": data["_meta"]["updated"],
+            "ivSeries": constant_maturity_series(hist),
         })
 
     # Write index manifest
     idx_path = OUT_DIR / "index.json"
     idx_path.write_text(
-        json.dumps({
+        json.dumps(clean_nan({
             "updated": datetime.now(BJ).isoformat(timespec="seconds"),
             "underlyings": index_meta,
-        }, ensure_ascii=False, indent=2),
+        }), ensure_ascii=False, indent=1, allow_nan=False),
         encoding="utf-8",
     )
     print(f"\n✓ index.json: {len(index_meta)} underlyings")

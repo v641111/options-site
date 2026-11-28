@@ -3,221 +3,218 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>A股 ETF 期权卖方收益率 — ZX Capital</title>
-<meta name="description" content="实时计算9只A股 ETF 期权（50ETF/沪深300/中证500/创业板/科创50 等）的卖出认沽/认购年化收益率，支持现金担保与交易所最低保证金两种模式。">
+<meta name="description" content="9 只 A 股 ETF 期权卖出认沽/认购年化收益率：安全垫、行权概率、IV 历史分位、跨标的精选，盘中每 10 分钟刷新。">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <link rel="canonical" href="https://options.zxcapitalgroup.com/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#06080d;--bg2:#080b12;--card:#0d1117;--bdr:#161d2a;--g:#00dc82;--gd:#00b36b;--r:#ff4d6a;--amb:#f0a050;--t:#e2e8f0;--tm:#94a3b8;--td:#64748b;--tb:#f1f5f9}
+:root{
+  --bg:#080b11;--bg2:#0b0f17;--sf:#10151f;--sf2:#151b27;--sf3:#1b2230;
+  --line:#1f2735;--line2:#2a3446;
+  --tx:#e8edf4;--tx2:#b3bdcc;--tx3:#8593a8;
+  --g:#1ed98f;--g2:#12b877;--gbg:rgba(30,217,143,.12);
+  --r:#ff6b85;--rbg:rgba(255,107,133,.12);
+  --a:#f5b452;--abg:rgba(245,180,82,.13);
+  --b:#6aa8ff;--bbg:rgba(106,168,255,.12);
+  --rad:14px;--mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'DM Sans','Noto Sans SC',system-ui,sans-serif;background:var(--bg);color:var(--t);line-height:1.6;-webkit-font-smoothing:antialiased}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'DM Sans','Noto Sans SC',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--tx);line-height:1.55;font-size:14px;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(1200px 500px at 15% -10%,rgba(30,217,143,.07),transparent 60%),radial-gradient(900px 400px at 100% 0,rgba(106,168,255,.05),transparent 60%);background-attachment:fixed}
 a{color:inherit;text-decoration:none}
-.mono{font-family:'Space Mono','Courier New',monospace}
-.wrap{max-width:1320px;margin:0 auto;padding:0 20px}
+button{font-family:inherit}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.wrap{max-width:1360px;margin:0 auto;padding:0 24px}
 
-.nav{position:sticky;top:0;z-index:100;background:rgba(6,8,13,.94);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--bdr)}
-.nav-in{display:flex;align-items:center;justify-content:space-between;height:60px;max-width:1320px;margin:0 auto;padding:0 20px}
-.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;color:var(--tb)}
-.logo-i{width:34px;height:34px;border-radius:7px;background:linear-gradient(135deg,var(--g),var(--gd));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--bg);font-family:'Space Mono',monospace}
-.nlinks{display:flex;gap:24px;align-items:center}
-.nlinks a{color:var(--tm);font-size:13px;font-weight:500;transition:color .2s}
-.nlinks a:hover{color:var(--g)}.nlinks .cur{color:var(--g);font-weight:700}
-.mbtn{display:none;background:none;border:none;color:var(--t);font-size:22px;cursor:pointer}
-.mmenu{display:none;background:var(--bg2);border-top:1px solid var(--bdr);padding:12px 20px}
-.mmenu a{display:block;padding:10px 0;color:var(--tm);font-size:14px}
+/* nav */
+.nav{position:sticky;top:0;z-index:100;background:rgba(8,11,17,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:58px;max-width:1360px;margin:0 auto;padding:0 24px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px}
+.logo-i{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--g),var(--g2));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#04140c;font-family:var(--mono)}
+.nlinks{display:flex;gap:26px;align-items:center}
+.nlinks a,.nlinks span{color:var(--tx2);font-size:14px;font-weight:500;transition:color .15s}
+.nlinks a:hover{color:var(--tx)}.nlinks .cur{color:var(--g);font-weight:700}
+.mbtn{display:none;background:none;border:1px solid var(--line2);border-radius:8px;color:var(--tx);font-size:18px;width:38px;height:36px;cursor:pointer;align-items:center;justify-content:center}
+.mmenu{display:none;border-top:1px solid var(--line);padding:6px 24px 12px}
+.mmenu.open{display:block}
+.mmenu a,.mmenu span{display:block;padding:11px 0;color:var(--tx2);font-size:15px;border-bottom:1px solid var(--line)}
+.mmenu .cur{color:var(--g);font-weight:700}
 
-.page-hd{padding:36px 20px 24px;max-width:1320px;margin:0 auto}
-.page-title{font-size:26px;font-weight:700;margin-bottom:4px}
-.page-sub{color:var(--td);font-size:13px}
+/* header */
+.hd{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;padding:34px 0 22px}
+.hd h1{font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.2}
+.hd h1 em{font-style:normal;color:var(--g)}
+.hd p{color:var(--tx2);font-size:14px;margin-top:6px}
+.status{display:flex;align-items:center;gap:10px;background:var(--sf);border:1px solid var(--line);border-radius:999px;padding:8px 16px 8px 13px;font-size:13px;color:var(--tx2);flex-wrap:wrap}
+.status b{color:var(--tx);font-weight:600}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--tx3);flex-shrink:0}
+.dot.open{background:var(--g);box-shadow:0 0 0 4px rgba(30,217,143,.18);animation:pulse 2s infinite}
+.dot.pre{background:var(--a)}
+.dot.stale{background:var(--r)}
+@keyframes pulse{50%{box-shadow:0 0 0 7px rgba(30,217,143,0)}}
+.status .sep{width:1px;height:14px;background:var(--line2)}
 
-/* Status bar */
-.sbar{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px}
-.mkt-dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
-.dot-open{background:var(--g);box-shadow:0 0 7px var(--g);animation:pulse 2s infinite}
-.dot-pre{background:var(--amb)}
-.dot-cls{background:var(--td)}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-.mkt-label{font-size:13px;font-weight:600}
-.under-disp{display:flex;align-items:center;gap:14px;font-size:13px}
-.under-disp b{font-family:'Space Mono',monospace;font-weight:700;color:var(--g);font-size:16px}
-.sbar-meta{margin-left:auto;display:flex;gap:18px;align-items:center;font-size:12px;color:var(--td)}
-.sbar-meta b{font-family:'Space Mono',monospace;color:var(--tm)}
+/* underlying strip */
+.strip{display:grid;grid-template-columns:repeat(9,minmax(128px,1fr));gap:10px;overflow-x:auto;padding-bottom:4px;margin-bottom:22px;scrollbar-width:thin}
+.uc{background:var(--sf);border:1px solid var(--line);border-radius:12px;padding:11px 13px;cursor:pointer;transition:border-color .15s,background .15s;min-width:128px;text-align:left;color:inherit}
+.uc:hover{border-color:var(--line2);background:var(--sf2)}
+.uc.on{border-color:var(--g);background:linear-gradient(180deg,rgba(30,217,143,.08),var(--sf))}
+.uc-n{font-size:13px;font-weight:600;color:var(--tx);white-space:nowrap}
+.uc-c{font-size:11px;color:var(--tx3);font-family:var(--mono)}
+.uc-p{display:flex;justify-content:space-between;align-items:baseline;margin-top:6px;gap:6px}
+.uc-px{font-family:var(--mono);font-size:15px;font-weight:600}
+.uc-ch{font-family:var(--mono);font-size:12px;font-weight:600}
+.uc-iv{font-size:11px;color:var(--tx3);margin-top:2px}
+.uc-iv b{color:var(--tx2);font-family:var(--mono);font-weight:600}
+.up{color:var(--r)}.dn{color:var(--g)}  /* A股: 红涨绿跌 */
 
-/* Controls */
-.ctrls{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:14px 18px;margin-bottom:18px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
-.ctrl-grp{display:flex;align-items:center;gap:8px}
-.ctrl-lab{font-size:11px;color:var(--td);font-weight:500;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
-.cgroup{display:flex;background:var(--bg);border:1px solid var(--bdr);border-radius:7px;padding:2px;gap:1px}
-.cbtn{padding:5px 11px;border-radius:5px;border:none;background:transparent;color:var(--tm);font-size:12px;font-weight:600;cursor:pointer;font-family:'Space Mono',monospace;transition:all .15s;white-space:nowrap}
-.cbtn.on{background:var(--g);color:var(--bg)}
-.under-sel{background:var(--bg);border:1px solid var(--bdr);color:var(--t);font-size:13px;padding:7px 12px;border-radius:7px;cursor:pointer;font-family:'DM Sans',sans-serif;outline:none;min-width:200px}
-.under-sel:focus{border-color:var(--g)}
-.slider-grp{display:flex;align-items:center;gap:10px;min-width:240px}
-.slider{flex:1;-webkit-appearance:none;appearance:none;height:4px;background:var(--bdr);border-radius:2px;outline:none}
-.slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:var(--g);cursor:pointer;box-shadow:0 0 0 3px rgba(0,220,130,.15)}
-.slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--g);cursor:pointer;border:none}
-.slider-v{font-family:'Space Mono',monospace;font-size:13px;color:var(--g);font-weight:700;min-width:40px;text-align:right}
-.rbtn{padding:7px 14px;border-radius:7px;border:1px solid var(--bdr);background:transparent;color:var(--tm);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:5px;margin-left:auto}
-.rbtn:hover{border-color:var(--g);color:var(--g)}
-.rbtn .spin{display:inline-block;animation:spin .7s linear infinite}
+/* tabs */
+.tabs{display:flex;gap:4px;margin-bottom:16px;background:var(--sf);border:1px solid var(--line);border-radius:12px;padding:4px;width:max-content;max-width:100%;overflow-x:auto}
+.tab{background:none;border:none;color:var(--tx2);font-size:14px;font-weight:600;padding:9px 18px;cursor:pointer;border-radius:9px;white-space:nowrap;transition:all .15s}
+.tab:hover{color:var(--tx)}
+.tab.on{background:var(--sf3);color:var(--tx);box-shadow:inset 0 0 0 1px var(--line2)}
+.tab .cnt{font-size:11px;color:var(--g);margin-left:6px;font-family:var(--mono)}
+
+/* toolbar */
+.bar{background:var(--sf);border:1px solid var(--line);border-radius:var(--rad);padding:14px 16px;display:flex;flex-wrap:wrap;gap:14px 22px;align-items:center;margin-bottom:12px}
+.fld{display:flex;align-items:center;gap:9px}
+.lab{font-size:12px;color:var(--tx3);font-weight:600;white-space:nowrap}
+.seg{display:inline-flex;background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:3px;gap:2px}
+.seg button{padding:6px 12px;border-radius:7px;border:none;background:transparent;color:var(--tx2);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .12s}
+.seg button:hover{color:var(--tx)}
+.seg button.on{background:var(--g);color:#04140c}
+.rng{display:flex;align-items:center;gap:10px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:130px;height:4px;background:var(--line2);border-radius:2px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--g);cursor:pointer;border:3px solid var(--bg)}
+input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--g);cursor:pointer;border:3px solid var(--bg)}
+.rv{font-family:var(--mono);font-size:13px;color:var(--g);font-weight:600;min-width:42px}
+.bar .grow{flex:1}
+.sel{background:var(--bg2);border:1px solid var(--line2);color:var(--tx);font-size:14px;font-weight:600;padding:7px 30px 7px 12px;border-radius:9px;cursor:pointer;outline:none;font-family:inherit;-webkit-appearance:none;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--tx3) 50%),linear-gradient(135deg,var(--tx3) 50%,transparent 50%);background-position:calc(100% - 15px) 50%,calc(100% - 10px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+.sel:focus{border-color:var(--g)}
+.ghost{padding:7px 13px;border-radius:9px;border:1px solid var(--line2);background:transparent;color:var(--tx2);font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.ghost:hover{border-color:var(--g);color:var(--g)}
+.ghost.spin span{display:inline-block;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.rbtn:not(.loading) .spin{animation:none}
 
-/* Table */
-.err-bar{background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.2);border-radius:8px;padding:9px 14px;font-size:12px;color:var(--r);display:none;margin-bottom:12px}
-.tw{overflow-x:auto;border-radius:12px;border:1px solid var(--bdr);margin-bottom:32px;background:var(--card)}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{background:var(--card);color:var(--td);font-weight:600;text-transform:uppercase;font-size:10px;letter-spacing:.05em;padding:12px 14px;text-align:left;border-bottom:1px solid var(--bdr);white-space:nowrap;cursor:pointer;user-select:none;transition:color .15s;position:sticky;top:60px;z-index:50}
-th:hover{color:var(--t)}th.srt{color:var(--g)}
-.sarr{margin-left:3px;font-size:9px;opacity:.5}th.srt .sarr{opacity:1}
-.tip{display:inline-block;margin-left:4px;font-size:11px;color:var(--td);cursor:help;opacity:.6;transition:opacity .15s;position:relative;font-family:'DM Sans',sans-serif;font-weight:400;text-transform:none;letter-spacing:0}
-.tip:hover{opacity:1;color:var(--g)}
-.tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--bdr);color:var(--t);font-size:11px;font-weight:400;line-height:1.55;letter-spacing:0;text-transform:none;padding:10px 13px;border-radius:8px;white-space:pre-line;width:max-content;max-width:320px;text-align:left;opacity:0;pointer-events:none;transition:opacity .15s;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.4)}
-.tip:hover::after{opacity:1}
-td{padding:11px 14px;border-bottom:1px solid rgba(22,29,42,.7);white-space:nowrap}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(13,17,23,.6)}
-tr.clickable{cursor:pointer;transition:background .15s}
-tr.clickable:hover td{background:rgba(0,220,130,.04)!important}
+.chips{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin:4px 0 12px}
+.chip{padding:6px 13px;border-radius:999px;border:1px solid var(--line2);background:var(--sf);color:var(--tx2);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.chip:hover{color:var(--tx);border-color:var(--tx3)}
+.chip.on{background:var(--gbg);border-color:var(--g);color:var(--g)}
+.chip small{font-family:var(--mono);font-size:11px;opacity:.75;margin-left:4px}
 
-.tk{font-family:'Space Mono',monospace;font-size:11px;color:var(--g);font-weight:700}
-.tk-name{font-weight:600;color:var(--t);margin-bottom:2px}
-.tag{display:inline-block;font-size:9px;padding:1px 6px;border-radius:3px;font-weight:700;margin-left:5px}
-.tag-itm{background:rgba(0,220,130,.12);color:var(--g)}
-.tag-atm{background:rgba(240,160,80,.12);color:var(--amb)}
-.tag-otm{background:rgba(100,116,139,.12);color:var(--td)}
+.note{font-size:13px;color:var(--tx3);margin:0 2px 12px}
+.note b{color:var(--tx2);font-weight:600}
+.err{background:var(--rbg);border:1px solid rgba(255,107,133,.3);color:var(--r);border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:12px;display:none}
 
-.bid-ask{font-family:'Space Mono',monospace;font-size:12px}
-.bid-ask .b{color:var(--g)}
-.bid-ask .a{color:var(--r)}
-.bid-ask .sep{color:var(--td)}
+/* table */
+.tw{border:1px solid var(--line);border-radius:var(--rad);background:var(--sf);overflow:auto;max-height:calc(100vh - 150px);margin-bottom:28px;position:relative}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:13.5px}
+th{position:sticky;top:0;z-index:3;background:var(--sf2);color:var(--tx2);font-weight:600;font-size:12.5px;padding:11px 14px;text-align:right;border-bottom:1px solid var(--line2);white-space:nowrap;cursor:pointer;user-select:none}
+th:hover{color:var(--tx)}
+th.l,td.l{text-align:left}
+th.on{color:var(--g)}
+th .ar{display:inline-block;width:10px;margin-left:3px;font-size:10px;opacity:.5}
+th.on .ar{opacity:1}
+th .q{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;border:1px solid var(--line2);font-size:10px;color:var(--tx3);margin-left:5px;vertical-align:1px;cursor:help;font-weight:700}
+th .q:hover{border-color:var(--g);color:var(--g)}
+td{padding:11px 14px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;vertical-align:middle}
+tbody tr{cursor:pointer;transition:background .1s}
+tbody tr:hover td{background:var(--sf2)}
+tbody tr:last-child td{border-bottom:none}
+.stk{position:sticky;left:0;z-index:2;background:var(--sf)}
+th.stk{z-index:4;background:var(--sf2)}
+tbody tr:hover td.stk{background:var(--sf2)}
+.sub{display:block;font-size:12px;color:var(--tx3);margin-top:1px;font-family:'DM Sans','Noto Sans SC',sans-serif;font-weight:400}
+.k{font-family:var(--mono);font-weight:600;font-size:14px;color:var(--tx)}
+.tag{display:inline-block;font-size:11.5px;padding:2px 7px;border-radius:5px;font-weight:600;font-family:'DM Sans','Noto Sans SC',sans-serif}
+.t-otm{background:var(--bbg);color:var(--b)}
+.t-atm{background:var(--abg);color:var(--a)}
+.t-itm{background:var(--rbg);color:var(--r)}
+.t-dim{background:var(--sf3);color:var(--tx3)}
+.y{font-family:var(--mono);font-weight:700;font-size:15px}
+.y1{color:var(--g)}.y2{color:#7fe3b6}.y3{color:var(--tx)}.y4{color:var(--tx3)}
+.bar-p{display:inline-block;width:42px;height:5px;border-radius:3px;background:var(--line2);vertical-align:middle;margin-right:8px;overflow:hidden}
+.bar-p i{display:block;height:100%;border-radius:3px}
+.ba .b{color:var(--g)}.ba .a{color:var(--r)}.ba .s{color:var(--tx3)}
+.wide{color:var(--a)}
+tr.ill td{color:var(--tx3)}
+tr.ill .y,tr.ill .k{color:var(--tx3)!important}
+.empty td{text-align:center;padding:46px;color:var(--tx3);cursor:default}
+.lsp{display:inline-block;width:16px;height:16px;border:2px solid var(--line2);border-top-color:var(--g);border-radius:50%;animation:spin .7s linear infinite;margin-right:9px;vertical-align:-3px}
 
-.yld-hi{color:#00dc82;font-weight:700;font-family:'Space Mono',monospace}
-.yld-md{color:#5ddba3;font-weight:700;font-family:'Space Mono',monospace}
-.yld-lo{color:var(--tm);font-weight:600;font-family:'Space Mono',monospace}
-.yld-na{color:var(--td);font-family:'Space Mono',monospace;opacity:.6}
+/* IV view */
+.spark{display:block}
+.pct{font-family:var(--mono);font-weight:700}
+.pct.hi{color:var(--g)}.pct.md{color:var(--a)}.pct.lo{color:var(--tx3)}
+.ivc{display:inline-block;font-family:var(--mono);font-weight:600;font-size:14px;padding:4px 9px;border-radius:7px;min-width:62px;text-align:center}
+.ivc.top{background:var(--gbg);color:var(--g);box-shadow:inset 0 0 0 1px rgba(30,217,143,.35)}
+.ivk{display:block;font-size:11px;color:var(--tx3);font-family:var(--mono);margin-top:3px}
 
-/* Greyed-out rows for one-sided / no-trade contracts */
-tr.illiq td{opacity:.4;color:var(--td)}
-tr.illiq:hover td{background:rgba(13,17,23,.3)!important}
-tr.illiq .yld-hi,tr.illiq .yld-md,tr.illiq .yld-lo,tr.illiq .yld-na{color:var(--td)!important}
-tr.illiq .tk,tr.illiq .tk-name{color:var(--td)!important}
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:22px}
+.card{background:var(--sf);border:1px solid var(--line);border-radius:var(--rad);padding:18px 20px}
+.card h3{font-size:15px;font-weight:700;margin-bottom:8px}
+.card p,.card li{font-size:13.5px;color:var(--tx2);line-height:1.75}
+.card ul{padding-left:18px}
+.card b{color:var(--tx);font-weight:600}
+.disc{border:1px solid rgba(245,180,82,.25);background:linear-gradient(180deg,rgba(245,180,82,.05),transparent);border-radius:var(--rad);padding:18px 22px;margin-bottom:40px}
+.disc h4{font-size:14px;color:var(--a);margin-bottom:6px}
+.disc p{font-size:13px;color:var(--tx2);line-height:1.75}
 
-.load-row td{text-align:center;padding:36px;color:var(--td)}
-.lspin{display:inline-block;width:16px;height:16px;border:2px solid var(--bdr);border-top-color:var(--g);border-radius:50%;animation:spin .7s linear infinite;margin-right:8px;vertical-align:middle}
+footer{border-top:1px solid var(--line);padding:26px 0 30px;color:var(--tx3);font-size:12.5px}
+footer .wrap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center}
 
-/* Info cards */
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px;margin-bottom:32px}
-.icard{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:20px}
-.icard h3{font-size:14px;font-weight:700;margin-bottom:12px;color:var(--tb)}
-.icard p,.icard li{font-size:13px;color:var(--td);line-height:1.7}
-.icard ul{padding-left:16px}.icard li{margin-bottom:3px}
-.icard b{color:var(--tm)}
+/* tooltip */
+#tt{position:fixed;z-index:2000;max-width:320px;background:#1a2130;border:1px solid var(--line2);color:var(--tx);font-size:12.5px;line-height:1.65;padding:10px 13px;border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.5);pointer-events:none;opacity:0;transition:opacity .12s;white-space:pre-line}
+#tt.on{opacity:1}
 
+/* modal */
+.mbg{position:fixed;inset:0;background:rgba(3,5,9,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:1000;padding:18px}
+.mbg.on{display:flex}
+.mdl{background:var(--sf);border:1px solid var(--line2);border-radius:18px;width:min(100%,520px);max-height:92vh;overflow:auto;box-shadow:0 30px 80px rgba(0,0,0,.6);position:relative}
+.mdl-x{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;border:none;background:var(--sf3);color:var(--tx2);font-size:15px;cursor:pointer}
+.mdl-x:hover{color:var(--tx)}
+.mb{padding:22px 24px 20px}
+.m-brand{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--tx3);margin-bottom:14px}
+.m-brand .logo-i{width:22px;height:22px;font-size:9px;border-radius:6px}
+.m-t{font-size:20px;font-weight:700;margin-bottom:6px;padding-right:36px}
+.m-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.m-big{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.m-big div{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:11px 12px}
+.m-big span{display:block;font-size:12px;color:var(--tx3)}
+.m-big b{display:block;font-family:var(--mono);font-size:19px;margin-top:2px}
+.m-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;margin-bottom:16px}
+.m-grid div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding-bottom:6px;font-size:13px}
+.m-grid span{color:var(--tx3)}
+.m-grid b{font-family:var(--mono);font-weight:600}
+.m-h{font-size:13px;font-weight:700;color:var(--tx2);margin:4px 0 8px}
+.m-sc{width:100%;font-size:13px;margin-bottom:16px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.m-sc th{position:static;cursor:default;background:var(--sf2);font-size:12px;padding:8px 10px}
+.m-sc td{padding:8px 10px;cursor:default}
+.m-sc tr:hover td{background:none}
+.m-f{background:var(--bg2);border:1px dashed var(--line2);border-radius:10px;padding:11px 13px;font-family:var(--mono);font-size:12px;line-height:1.75;color:var(--tx2);white-space:pre-wrap;margin-bottom:12px}
+.m-f b{color:var(--g)}
+.m-foot{text-align:center;font-size:11.5px;color:var(--tx3)}
 
-/* ─── View tabs & expiry chips ─── */
-.view-tabs{display:flex;gap:8px;margin-bottom:18px;border-bottom:1px solid var(--bdr);padding-bottom:0}
-.vt-btn{background:none;border:none;color:var(--tm);font-size:14px;font-weight:600;padding:10px 18px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;font-family:inherit}
-.vt-btn:hover{color:var(--t)}
-.vt-btn.on{color:var(--g);border-bottom-color:var(--g)}
+.view{display:none}.view.on{display:block}
 
-.expiry-chips{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center;padding:10px 0}
-.ec-lab{font-size:11px;color:var(--td);text-transform:uppercase;letter-spacing:.04em;margin-right:4px}
-.ec-chip{padding:5px 12px;border-radius:14px;border:1px solid var(--bdr);background:var(--bg);color:var(--tm);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'Space Mono',monospace}
-.ec-chip:hover{border-color:var(--g);color:var(--g)}
-.ec-chip.on{background:var(--g);color:var(--bg);border-color:var(--g)}
-.ec-chip .ec-days{opacity:.65;margin-left:4px;font-size:10px}
-.ec-chip.on .ec-days{opacity:1}
-
-/* ─── IV compare grid (improved spacing + history) ─── */
-.iv-toolbar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:14px 18px;margin-bottom:16px}
-.iv-grid{background:var(--card);border:1px solid var(--bdr);border-radius:12px;overflow:auto;margin-bottom:24px}
-.iv-grid table{width:100%;border-collapse:collapse;min-width:680px}
-.iv-grid th{background:rgba(0,0,0,.25);color:var(--td);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;padding:14px 16px;text-align:center;border-bottom:1px solid var(--bdr);white-space:nowrap}
-.iv-grid th:first-child{text-align:left;min-width:200px}
-.iv-grid th .th-mo{font-size:12px;font-weight:700;color:var(--t);display:block}
-.iv-grid th .th-days{font-size:9px;color:var(--td);font-weight:500;margin-top:3px;display:block}
-.iv-grid td{padding:18px 16px;border-bottom:1px solid rgba(22,29,42,.6);text-align:center;font-family:'Space Mono',monospace;vertical-align:middle;line-height:1.3}
-.iv-grid td:first-child{text-align:left}
-.iv-grid tr:last-child td{border-bottom:none}
-.iv-grid tr:hover td{background:rgba(13,17,23,.5)}
-.iv-name{font-weight:600;color:var(--t);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.3}
-.iv-name .sub{display:block;font-size:10px;color:var(--td);font-family:'Space Mono',monospace;margin-top:3px;font-weight:500}
-.iv-cell-wrap{display:flex;flex-direction:column;align-items:center;gap:5px}
-.iv-cell{font-size:15px;font-weight:700;padding:6px 12px;border-radius:6px;display:inline-block;min-width:64px;line-height:1.2}
-.iv-cell.top{background:rgba(0,220,130,.18);color:var(--g);box-shadow:0 0 0 1px rgba(0,220,130,.25) inset}
-.iv-cell.high{color:var(--g)}
-.iv-cell.mid{color:var(--tm)}
-.iv-cell.low{color:var(--td)}
-.iv-cell.na{color:var(--td);opacity:.4}
-.iv-meta{font-size:9px;color:var(--td);font-weight:500;line-height:1.3}
-.iv-meta .pct{font-family:'Space Mono',monospace;font-weight:700}
-.iv-meta .pct.hi{color:var(--g)}     /* high percentile = expensive option = good for selling */
-.iv-meta .pct.mid{color:var(--amb)}
-.iv-meta .pct.lo{color:var(--r)}
-.iv-meta .ki{color:var(--td);opacity:.7}
-.iv-strike{font-size:9px;color:var(--td);opacity:.65;font-family:'Space Mono',monospace}
-.iv-spot{font-family:'Space Mono',monospace;color:var(--tm);font-size:12px}
-.iv-load{text-align:center;padding:40px;color:var(--td)}
-
-/* ─── view containers ─── */
-.view{display:none}
-.view.on{display:block}
-
-.disc{background:var(--card);border:1px solid #2a1c1c;border-radius:12px;padding:22px 26px;margin-bottom:40px}
-.disc h4{font-size:13px;font-weight:700;color:var(--amb);margin-bottom:8px}
-.disc p{font-size:12px;color:var(--td);line-height:1.7;margin-bottom:6px}
-
-footer{border-top:1px solid var(--bdr);padding:30px 20px 22px;background:var(--bg)}
-.fi{max-width:1320px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}
-.fc{color:var(--td);font-size:11px;line-height:1.6}
-
-/* Modal share card */
-.mdl-bg{position:fixed;inset:0;background:rgba(2,4,8,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px;animation:fadeIn .2s ease}
-.mdl-bg.on{display:flex}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.mdl-card{background:linear-gradient(165deg,#0e1420 0%,#0a0d14 100%);border:1px solid rgba(255,255,255,.08);border-radius:20px;width:min(92vw,460px);aspect-ratio:9/12;padding:0;display:flex;flex-direction:column;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 1px rgba(0,220,130,.05);overflow:hidden;animation:popIn .25s cubic-bezier(.34,1.4,.6,1)}
-@keyframes popIn{from{opacity:0;transform:scale(.94) translateY(8px)}to{opacity:1;transform:none}}
-.mdl-close{position:absolute;top:12px;right:14px;width:28px;height:28px;border:none;background:rgba(255,255,255,.06);color:var(--tm);font-size:14px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:5;transition:all .15s}
-.mdl-close:hover{background:rgba(255,255,255,.12);color:var(--t)}
-.mdl-body{padding:22px 24px 18px;display:flex;flex-direction:column;height:100%;overflow:hidden}
-.mdl-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06)}
-.mdl-brand{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--tm);letter-spacing:.5px}
-.mdl-brand .logo-i{width:22px;height:22px;font-size:10px;border-radius:5px}
-.mdl-bdate{font-size:10px;color:var(--td);font-family:'Space Mono',monospace}
-.mdl-title{font-size:18px;font-weight:700;color:var(--tb);margin-bottom:3px;line-height:1.25}
-.mdl-sub{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-.mdl-sub .tk{font-family:'Space Mono',monospace;color:var(--g);font-size:11px;font-weight:700}
-.mdl-sub .b{display:inline-block;font-size:9px;padding:2px 7px;border-radius:3px;font-weight:700}
-.mdl-yld-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.mdl-yld{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:12px 13px;text-align:center}
-.mdl-yld-lab{font-size:10px;color:var(--td);margin-bottom:3px;letter-spacing:.4px}
-.mdl-yld-val{font-size:22px;font-weight:700;font-family:'Space Mono',monospace;line-height:1.1}
-.mdl-yld-note{font-size:9px;color:var(--td);margin-top:3px}
-.mdl-calc{background:rgba(0,0,0,.25);border:1px dashed rgba(255,255,255,.08);border-radius:10px;padding:10px 12px;margin-bottom:14px;font-family:'Space Mono',monospace;font-size:10px;line-height:1.55;color:var(--tm)}
-.mdl-calc .label{color:var(--td);font-size:9px;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;font-family:'DM Sans',sans-serif;font-weight:600;display:block}
-.mdl-calc b{color:var(--g);font-weight:700}
-.mdl-info{display:grid;grid-template-columns:1fr 1fr;gap:7px 14px;margin-top:auto;padding-top:14px;border-top:1px solid rgba(255,255,255,.06)}
-.mdl-info-item{display:flex;flex-direction:column;gap:2px}
-.mdl-info-lab{font-size:9px;color:var(--td);letter-spacing:.4px}
-.mdl-info-val{font-size:13px;font-weight:700;color:var(--t);font-family:'Space Mono',monospace}
-.mdl-info-val.warn{color:var(--r)}
-.mdl-info-val.ok{color:var(--g)}
-.mdl-info-val.mid{color:var(--amb)}
-.mdl-footer{margin-top:10px;text-align:center;font-size:9px;color:var(--td);letter-spacing:.5px}
-
-@media(max-width:768px){
-  .nlinks{display:none!important}.mbtn{display:flex!important}.mmenu.open{display:block!important}
-  .sbar-meta{margin-left:0;width:100%;flex-wrap:wrap;gap:10px}
-  .ctrls{flex-direction:column;align-items:stretch;gap:12px}
-  .ctrl-grp{justify-content:space-between}
-  .rbtn{margin-left:0}
-  th,td{padding:9px 10px;font-size:11px}
-  th{position:static}
-  .page-title{font-size:22px}
+@media(max-width:860px){
+  .wrap,.nav-in{padding:0 16px}
+  .nlinks{display:none}.mbtn{display:inline-flex}
+  .hd{padding:22px 0 16px}
+  .hd h1{font-size:23px}
+  .strip{grid-template-columns:repeat(9,128px)}
+  .bar{padding:12px;gap:12px}
+  .fld{width:100%;justify-content:space-between}
+  .bar .grow{display:none}
+  input[type=range]{width:110px}
+  .tw{max-height:none}
+  th,td{padding:10px 11px}
+  .m-big{grid-template-columns:1fr 1fr 1fr}
+  .m-grid{grid-template-columns:1fr}
 }
 </style></head><body>
 
@@ -230,883 +227,576 @@ footer{border-top:1px solid var(--bdr);padding:30px 20px 22px;background:var(--b
     <span class="cur">期权</span>
     <a href="https://zxcapitalgroup.com/calculator/">Tools</a>
   </div>
-  <button class="mbtn" onclick="document.getElementById('mm').classList.toggle('open')">☰</button>
+  <button class="mbtn" aria-label="菜单" onclick="document.getElementById('mm').classList.toggle('open')">☰</button>
 </div>
 <div id="mm" class="mmenu">
   <a href="https://zxcapitalgroup.com/etf/">ETF</a>
+  <a href="https://zxcapitalgroup.com/stock/">Stocks</a>
   <a href="https://lof.zxcapitalgroup.com/">LOF套利</a>
+  <span class="cur">期权</span>
   <a href="https://zxcapitalgroup.com/calculator/">Tools</a>
 </div></nav>
 
 <div class="wrap">
-<div class="page-hd">
-  <h1 class="page-title">A股 ETF 期权 卖方收益率</h1>
-  <p class="page-sub">9 只 ETF 期权全覆盖 · 实时年化 yield · 支持现金担保 / 交易所最低保证金两种模式</p>
+<header class="hd">
+  <div>
+    <h1>A股 ETF 期权 · <em>卖方收益率</em></h1>
+    <p>9 只 ETF 期权 · 安全垫 / 行权概率 / IV 历史分位 · 盘中每 10 分钟刷新</p>
+  </div>
+  <div class="status" id="status"><span class="dot" id="dot"></span><span id="stMkt">--</span><span class="sep"></span><span>数据 <b id="stUpd">--</b></span><span class="sep"></span><span>下次 <b id="stNext">--</b></span></div>
+</header>
+
+<div class="strip" id="strip"></div>
+
+<div class="tabs" role="tablist">
+  <button class="tab on" data-view="pick" onclick="setView('pick')">卖方精选<span class="cnt" id="pickCnt"></span></button>
+  <button class="tab" data-view="chain" onclick="setView('chain')">期权链</button>
+  <button class="tab" data-view="iv" onclick="setView('iv')">IV 对比</button>
 </div>
 
-<div class="view-tabs">
-  <button class="vt-btn on" id="vtChain" onclick="setView('chain')">📈 期权链</button>
-  <button class="vt-btn"    id="vtIv"    onclick="setView('iv')">🔥 IV 对比</button>
+<!-- shared controls -->
+<div class="bar" id="sharedBar">
+  <div class="fld"><span class="lab">方向</span><div class="seg" data-k="type">
+    <button data-v="P" class="on">卖认沽 Put</button><button data-v="C">卖认购 Call</button></div></div>
+  <div class="fld"><span class="lab">资金口径</span><div class="seg" data-k="margin">
+    <button data-v="cash" class="on">现金担保/备兑</button><button data-v="exchange">交易所保证金</button></div></div>
+  <div class="fld" id="upliftFld" style="display:none"><span class="lab">券商上浮</span><div class="rng"><input type="range" id="uplift" min="0" max="50" step="5" value="10"><span class="rv" id="upliftV">10%</span></div></div>
+  <div class="fld"><span class="lab">成交价</span><div class="seg" data-k="px">
+    <button data-v="bid" class="on">买一价</button><button data-v="mid">中间价</button></div></div>
+  <span class="grow"></span>
+  <button class="ghost" id="rfBtn" onclick="manualRefresh()"><span>↻</span>刷新</button>
 </div>
+<div class="err" id="err"></div>
 
-<div id="viewChain" class="view on">
+<!-- PICK -->
+<section class="view on" id="v-pick">
+  <div class="bar">
+    <div class="fld"><span class="lab" data-tip="|Delta| 近似为到期被行权的概率。&#10;卖方常用 0.15–0.30：收益与安全的平衡点。">行权概率 ≤</span><div class="rng"><input type="range" id="fDelta" min="5" max="50" step="5" value="30"><span class="rv" id="fDeltaV">30%</span></div></div>
+    <div class="fld"><span class="lab">剩余天数</span><div class="seg" data-k="days">
+      <button data-v="0-30">≤30天</button><button data-v="10-70" class="on">10–70天</button><button data-v="0-999">全部</button></div></div>
+    <div class="fld"><span class="lab" data-tip="持仓量太小的合约挂单稀、价差大，实际很难按表中价格成交。">最少持仓</span><div class="seg" data-k="oi">
+      <button data-v="0">不限</button><button data-v="500" class="on">500张</button><button data-v="3000">3000张</button></div></div>
+    <div class="fld"><span class="lab">每标的</span><div class="seg" data-k="per">
+      <button data-v="2" class="on">最多2张</button><button data-v="99">不限</button></div></div>
+  </div>
+  <p class="note" id="pickNote">在 9 个标的里筛出 <b>虚值、流动性够、行权概率可控</b> 的合约，按年化收益排序。点任意一行看到期盈亏推演。</p>
+  <div class="tw"><table><thead id="pickHead"></thead><tbody id="pickBody"><tr class="empty"><td colspan="12"><span class="lsp"></span>加载 9 个标的…</td></tr></tbody></table></div>
+</section>
 
-<!-- Status bar -->
-<div class="sbar">
-  <span class="mkt-dot" id="mktDot"></span>
-  <span class="mkt-label" id="mktLabel">--</span>
-  <div class="under-disp">
-    <span id="underName" style="color:var(--td)">--</span>
-    <b id="underPrice">--</b>
-    <span id="underChg" class="mono" style="font-size:12px">--</span>
+<!-- CHAIN -->
+<section class="view" id="v-chain">
+  <div class="bar">
+    <div class="fld"><span class="lab">标的</span><select id="underSel" class="sel" onchange="selUnder(this.value)"></select><span id="chainSpot" class="num" style="font-size:13px"></span></div>
+    <div class="fld"><span class="lab">虚实</span><div class="seg" data-k="mny">
+      <button data-v="otm" class="on">虚值+平值</button><button data-v="all">全部</button><button data-v="itm">实值</button></div></div>
+    <div class="fld"><span class="lab">最少持仓</span><div class="seg" data-k="coi">
+      <button data-v="0" class="on">不限</button><button data-v="500">500张</button></div></div>
   </div>
-  <div class="sbar-meta">
-    <span>数据时间: <b id="updTime">--</b></span>
-    <span>下次刷新: <b id="cdTimer">--</b></span>
-  </div>
-</div>
+  <div class="chips" id="expChips"></div>
+  <div class="tw"><table><thead id="chainHead"></thead><tbody id="chainBody"><tr class="empty"><td colspan="11"><span class="lsp"></span>加载中…</td></tr></tbody></table></div>
+</section>
 
-<!-- Controls -->
-<div class="ctrls">
-  <div class="ctrl-grp">
-    <span class="ctrl-lab">标的</span>
-    <select id="underSel" class="under-sel" onchange="onChangeUnder()"></select>
+<!-- IV -->
+<section class="view" id="v-iv">
+  <div class="bar">
+    <div class="fld"><span class="lab">行权价</span><div class="seg" data-k="ivk">
+      <button data-v="atm" class="on">平值 ATM</button><button data-v="otm5">虚值 5%</button></div></div>
   </div>
-  <div class="ctrl-grp">
-    <span class="ctrl-lab">类型</span>
-    <div class="cgroup">
-      <button class="cbtn on" id="optPut"  onclick="setOptType('P')">认沽 (Put)</button>
-      <button class="cbtn"    id="optCall" onclick="setOptType('C')">认购 (Call)</button>
-    </div>
-  </div>
-  <div class="ctrl-grp">
-    <span class="ctrl-lab">保证金</span>
-    <div class="cgroup">
-      <button class="cbtn"    id="mmEx"   onclick="setMarginMode('exchange')">交易所最低</button>
-      <button class="cbtn on" id="mmCash" onclick="setMarginMode('cash')">现金担保</button>
-    </div>
-  </div>
-  <div class="ctrl-grp slider-grp" id="upliftGrp" style="display:none">
-    <span class="ctrl-lab">券商上浮</span>
-    <input type="range" id="upliftSlider" class="slider" min="0" max="30" step="1" value="10" oninput="onUpliftChange(this.value)">
-    <span class="slider-v" id="upliftVal">10%</span>
-  </div>
-  <div class="ctrl-grp">
-    <span class="ctrl-lab">权利金</span>
-    <div class="cgroup">
-      <button class="cbtn on" id="pxBid"  onclick="setPxMode('bid')">买一 Bid</button>
-      <button class="cbtn"    id="pxMid"  onclick="setPxMode('mid')">中价 Mid</button>
-      <button class="cbtn"    id="pxLast" onclick="setPxMode('last')">最新</button>
-    </div>
-  </div>
-  <button class="rbtn" id="rfBtn" onclick="doRefresh()">
-    <span id="rfIcon">↻</span> 刷新
-  </button>
-</div>
+  <p class="note">IV 历史分位 = 今天的近月平值 IV 在过去所有交易日里排第几（越高 = 期权越贵 = 越适合卖）。期限结构列显示各到期月的 IV，绿框为同月最高。方向跟随上方「卖认沽 / 卖认购」。</p>
+  <div class="tw"><table><thead id="ivHead"></thead><tbody id="ivBody"><tr class="empty"><td colspan="8"><span class="lsp"></span>加载中…</td></tr></tbody></table></div>
+</section>
 
-<span id="errBar" class="err-bar"></span>
-
-<div class="expiry-chips" id="expiryChips">
-  <span class="ec-lab">到期月份</span>
-  <span class="ec-chip on" data-expiry="all">全部</span>
-</div>
-
-<!-- Table -->
-<div class="tw"><table id="optTbl">
-  <thead><tr>
-    <th onclick="sortBy('strike')" id="th_strike">行权价<span class="tip" data-tip="期权约定的执行价格。卖出认沽时,标的跌破此价就会被行权。">ⓘ</span><span class="sarr" id="sa_strike">↕</span></th>
-    <th onclick="sortBy('expiry')" id="th_expiry">到期 / 剩余天数<span class="tip" data-tip="A股 ETF 期权到期日 = 到期月份的第四个星期三。剩余天数按日历日计算。">ⓘ</span><span class="sarr" id="sa_expiry">↕</span></th>
-    <th onclick="sortBy('moneyness')" id="th_moneyness">价内/外%<span class="tip" data-tip="认沽期权:&#10;价内 (ITM): 行权价 > 标的价 → 大概率被行权&#10;平值 (ATM): 行权价 ≈ 标的价&#10;价外 (OTM): 行权价 < 标的价 → 大概率不被行权">ⓘ</span><span class="sarr" id="sa_moneyness">↕</span></th>
-    <th onclick="sortBy('bid')" id="th_bid">买卖价 Bid / Ask<span class="tip" data-tip="买一价(Bid) = 当前买家愿出的最高价&#10;卖一价(Ask) = 当前卖家挂的最低价&#10;卖出期权时:&#10;• 市价单 = 在 Bid 成交&#10;• 挂 Ask = 等买家来吃">ⓘ</span><span class="sarr" id="sa_bid">↕</span></th>
-    <th onclick="sortBy('volume')" id="th_volume">成交 / 持仓<span class="tip" data-tip="成交量: 当日累计成交张数&#10;持仓量: 未平仓张数(open interest)&#10;持仓量大 = 流动性好,买卖价差小">ⓘ</span><span class="sarr" id="sa_volume">↕</span></th>
-    <th onclick="sortBy('iv')" id="th_iv">隐含波动率 IV<span class="tip" data-tip="Implied Volatility, 由 Black-Scholes 公式从期权价反推&#10;表示市场预期的标的年化波动率&#10;&#10;• IV 高 → 期权贵 → 卖方收益率高&#10;• IV 低 → 期权便宜 → 卖方收益率低&#10;&#10;基准: 1年期国债利率 1.8%&#10;用中价 (bid+ask)/2 反推, 消除价差噪音">ⓘ</span><span class="sarr" id="sa_iv">↕</span></th>
-    <th onclick="sortBy('premium')" id="th_premium">权利金/张<span class="tip" data-tip="卖出 1 张合约能拿到的权利金 (元)&#10;= 期权价 × 合约乘数(10000)">ⓘ</span><span class="sarr" id="sa_premium">↕</span></th>
-    <th onclick="sortBy('margin')" id="th_margin">保证金/张<span class="tip" data-tip="卖出 1 张合约占用的保证金&#10;现金担保 = 行权价 × 10000&#10;交易所最低 = (权利金 + max(12% × 标的现价 − 虚值额, 7% × 行权价)) × 10000&#10;再乘 (1 + 上浮率)">ⓘ</span><span class="sarr" id="sa_margin">↕</span></th>
-    <th onclick="sortBy('yldp')" id="th_yldp">期间 yield<span class="tip" data-tip="= 权利金 ÷ 保证金 × 100%&#10;持有到期能拿到的净收益率">ⓘ</span><span class="sarr" id="sa_yldp">↕</span></th>
-    <th onclick="sortBy('yld')" id="th_yld" class="srt">年化 yield<span class="tip" data-tip="= 期间收益率 × (365 / 剩余天数)&#10;主排序字段,默认降序&#10;灰色 = 单边报价/无流动性,数据不可信">ⓘ</span><span class="sarr" id="sa_yld">↓</span></th>
-  </tr></thead>
-  <tbody id="tbody">
-    <tr class="load-row"><td colspan="10"><span class="lspin"></span>加载期权数据...</td></tr>
-  </tbody>
-</table></div>
-
-<!-- Info cards -->
 <div class="cards">
-  <div class="icard">
-    <h3>卖出认沽 (Sell Put) 是什么</h3>
-    <p>承诺在到期日前,若标的跌破行权价,你按行权价买入标的。换来的是<b>立即拿到的权利金</b>。</p>
-    <p style="margin-top:8px">本质上是"<b>跌到便宜价我也愿意接货</b>"——如果你本来就想在某价格买入标的,卖认沽相当于"边等边收租"。</p>
-  </div>
-  <div class="icard">
-    <h3>两种保证金模式</h3>
-    <ul>
-      <li><b>现金担保 (Cash-Secured)</b>: 锁定 strike × 10000 现金,被行权也能全款接货,不会爆仓</li>
-      <li><b>交易所最低</b>: 占用保证金低,yield 高 5-10 倍,但标的下跌时需追加保证金,跌穿行权价后接货资金压力大</li>
-    </ul>
-  </div>
-  <div class="icard">
-    <h3>读表小技巧</h3>
-    <ul>
-      <li>主排序按"年化 yield"降序</li>
-      <li><b style="color:var(--td);opacity:.5">灰色</b>行 = 单边报价/无成交,数据无意义</li>
-      <li>价内 (ITM) yield 高但被行权概率大</li>
-      <li>价外 (OTM) yield 低但安全垫厚</li>
-      <li>近月 yield 高,远月 yield 低(理论数学)</li>
-    </ul>
-  </div>
+  <div class="card"><h3>怎么读「年化收益」</h3>
+    <p>年化 = 时间价值 ÷ 占用资金 × 365 ÷ 剩余天数。只算<b>时间价值</b>，即<b>标的价格不动、持有到期</b>能落袋的部分。实值合约的内在价值被行权时要还回去，不计入收益，所以实值合约不会再出现几百 % 的虚高年化。</p></div>
+  <div class="card"><h3>安全垫与行权概率</h3>
+    <ul><li><b>安全垫</b>：标的还能跌多少（卖认购为涨多少）才开始亏钱，= 到盈亏平衡点的距离</li>
+    <li><b>行权概率</b>：用 |Delta| 近似到期变成实值的概率</li>
+    <li>安全垫厚、概率低的合约收益低，反之亦然，没有免费的午餐</li></ul></div>
+  <div class="card"><h3>两种资金口径</h3>
+    <ul><li><b>现金担保 / 备兑</b>：卖认沽备足 行权价×10000 现金；卖认购持有 10000 份 ETF。不会爆仓，最接近实际收益</li>
+    <li><b>交易所保证金</b>：按交易所最低公式再乘券商上浮，收益率高数倍，但下跌需追加保证金，可能被强平</li></ul></div>
 </div>
 
 <div class="disc">
-  <h4>⚠ 风险与免责</h4>
-  <p>期权卖方面临<b>无限亏损风险</b>。本工具仅作收益率计算参考,不构成投资建议。</p>
-  <p>交易所最低保证金会随标的价格波动每日盯市,标的剧烈下跌时需追加保证金,极端行情下可能被强平。新手建议从<b>现金担保模式</b>开始。</p>
-  <p>数据来源新浪财经 + 东方财富, 数据每隔约 20-30 分钟由 GitHub Actions 定时刷新, 非真正实时。</p>
+  <h4>⚠ 风险提示</h4>
+  <p>卖出认沽的最大亏损为（行权价 − 权利金）× 10000/张；无备兑卖出认购的亏损理论上无上限。交易所保证金每日盯市，剧烈行情下可能被强平。本页仅作收益率计算参考，不构成投资建议。数据来自新浪财经与东方财富，盘中约每 10 分钟由 GitHub Actions 抓取一次，有数分钟延迟；保证金按当前价近似计算，交易所实际以前结算价为准。</p>
+</div>
 </div>
 
-</div><!-- /viewChain -->
-
-<div id="viewIV" class="view">
-  <div class="iv-toolbar">
-    <div class="ctrl-grp">
-      <span class="ctrl-lab">类型</span>
-      <div class="cgroup">
-        <button class="cbtn on" id="ivPut"  onclick="setIvType('P')">认沽 IV</button>
-        <button class="cbtn"    id="ivCall" onclick="setIvType('C')">认购 IV</button>
-      </div>
-    </div>
-    <div class="ctrl-grp">
-      <span class="ctrl-lab">strike</span>
-      <div class="cgroup">
-        <button class="cbtn on" id="ivAtm" onclick="setIvStrike('atm')">平值 (ATM)</button>
-        <button class="cbtn"    id="ivOtm" onclick="setIvStrike('otm5')">虚值 5%</button>
-      </div>
-    </div>
-    <button class="rbtn" onclick="loadIvCompare(true)">
-      <span>↻</span> 重新加载
-    </button>
-  </div>
-  <div class="iv-grid">
-    <div id="ivBody"><div class="iv-load"><span class="lspin"></span>加载 9 个标的数据...</div></div>
-  </div>
-  <div class="cards">
-    <div class="icard">
-      <h3>怎么用这个 IV 对比</h3>
-      <p>同一到期月里, <b>IV 最高的 ETF</b> = 期权最贵 = 卖方拿到的权利金相对最丰厚。</p>
-      <p style="margin-top:8px">如果某个 ETF 的 IV 明显高于其他, 通常意味着市场预期它波动大 — 既是机会也是风险。</p>
-    </div>
-    <div class="icard">
-      <h3>ATM vs OTM 5%</h3>
-      <ul>
-        <li><b>平值 ATM</b>: 行权价最接近现价的合约, 时间价值最厚, 反映"基础 IV 水平"</li>
-        <li><b>虚值 5%</b>: 离现价 5% 的虚值合约, 反映"尾部风险溢价" (skew)</li>
-        <li>两者差异大 = IV smile 陡, 风险偏好失衡</li>
-      </ul>
-    </div>
-    <div class="icard">
-      <h3>颜色含义</h3>
-      <ul>
-        <li><span class="iv-cell top" style="font-size:11px;padding:2px 8px">绿色高亮</span> = 同一到期月里 IV 最高的标的</li>
-        <li>每行显示该 ETF 在不同到期月份的 IV 期限结构</li>
-        <li>同一 ETF 远月 IV 通常 ≥ 近月 (volatility term structure)</li>
-      </ul>
-    </div>
-  </div>
-</div>
-
-</div><!-- /wrap -->
-
-<footer><div class="fi">
-  <div class="logo" style="font-size:15px"><span class="logo-i">ZX</span>ZX Capital</div>
-  <div class="fc">数据来源: 东方财富 push2 · 交易日 09:30-15:00 实时刷新<br>本工具不构成投资建议,期权交易有风险,操作需谨慎</div>
+<footer><div class="wrap">
+  <div class="logo" style="font-size:14px"><span class="logo-i" style="width:26px;height:26px;font-size:10px">ZX</span>ZX Capital</div>
+  <div>数据：新浪财经 · 东方财富 ｜ 盘中每 10 分钟刷新 ｜ 不构成投资建议</div>
 </div></footer>
 
-<!-- Detail Modal -->
-<div id="mdlBg" class="mdl-bg" onclick="closeMdl(event)">
-  <div class="mdl-card" onclick="event.stopPropagation()">
-    <button class="mdl-close" onclick="closeMdl()">✕</button>
-    <div class="mdl-body" id="mdlBody"></div>
-  </div>
-</div>
+<div id="tt"></div>
+<div class="mbg" id="mbg" onclick="if(event.target===this)closeMdl()"><div class="mdl"><button class="mdl-x" onclick="closeMdl()" aria-label="关闭">✕</button><div class="mb" id="mb"></div></div></div>
 
 <script>
-// ══════════════════════════════════════════════════════════
-// CONFIG
-// ══════════════════════════════════════════════════════════
+// ═════════ CONFIG ═════════
 const UNDERLYINGS = [
-  {code:'510050', secid:'1.510050', name:'上证50ETF华夏',      short:'50ETF'},
-  {code:'510300', secid:'1.510300', name:'沪深300ETF华泰柏瑞',  short:'300ETF沪'},
-  {code:'510500', secid:'1.510500', name:'中证500ETF南方',      short:'500ETF沪'},
-  {code:'588000', secid:'1.588000', name:'科创50ETF华夏',       short:'科创50华夏'},
-  {code:'588080', secid:'1.588080', name:'科创50ETF易方达',     short:'科创50易'},
-  {code:'159901', secid:'0.159901', name:'深证100ETF易方达',    short:'深100ETF'},
-  {code:'159915', secid:'0.159915', name:'创业板ETF易方达',      short:'创业板ETF'},
-  {code:'159919', secid:'0.159919', name:'沪深300ETF嘉实',      short:'300ETF深'},
-  {code:'159922', secid:'0.159922', name:'中证500ETF嘉实',      short:'500ETF深'},
+  {code:'510050', name:'上证50ETF',   full:'上证50ETF华夏'},
+  {code:'510300', name:'沪深300ETF',  full:'沪深300ETF华泰柏瑞', tag:'沪'},
+  {code:'510500', name:'中证500ETF',  full:'中证500ETF南方', tag:'沪'},
+  {code:'588000', name:'科创50ETF',   full:'科创50ETF华夏', tag:'华夏'},
+  {code:'588080', name:'科创50ETF',   full:'科创50ETF易方达', tag:'易方达'},
+  {code:'159901', name:'深证100ETF',  full:'深证100ETF易方达'},
+  {code:'159915', name:'创业板ETF',   full:'创业板ETF易方达'},
+  {code:'159919', name:'沪深300ETF',  full:'沪深300ETF嘉实', tag:'深'},
+  {code:'159922', name:'中证500ETF',  full:'中证500ETF嘉实', tag:'深'},
 ];
-const CONTRACT_MULTIPLIER = 10000;
+const MULT = 10000;
+const uname = u => u.name + (u.tag ? `·${u.tag}` : '');
 
-const state = {
-  under: UNDERLYINGS[0],
-  optType: 'P',          // 'P' = put, 'C' = call
-  marginMode: 'cash',
-  uplift: 0.10,
-  pxMode: 'bid',
-  sortKey: 'yld',
-  sortDir: -1,
-  underPx: 0,
-  underChg: 0,
-  underName: '',
-  dataUpdated: '',
-  rawContracts: [],      // 全部合约 (含 calls + puts) 原始 JSON
-  rows: [],              // 经过 computeRow 计算后, 当前 type 过滤后的行
-  cdSec: 60,
-  cdTimer: null,
-  loading: false,
-};
+const LS_KEY = 'zx-opt-v2';
+const S = Object.assign({
+  view:'pick', under:'510300', type:'P', margin:'cash', uplift:0.10, px:'bid',
+  fDelta:0.30, days:'10-70', oi:'500', per:'2', mny:'otm', coi:'0', ivk:'atm',
+  expiry:'all', sortPick:['yld',-1], sortChain:['yld',-1],
+}, (() => { try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch(e) { return {}; } })());
+S.expiry = 'all';
+const save = () => { try {
+  const {view,under,type,margin,uplift,px,fDelta,days,oi,per,mny,coi,ivk,sortPick,sortChain} = S;
+  localStorage.setItem(LS_KEY, JSON.stringify({view,under,type,margin,uplift,px,fDelta,days,oi,per,mny,coi,ivk,sortPick,sortChain}));
+} catch(e){} };
 
-const underSel = document.getElementById('underSel');
-UNDERLYINGS.forEach(u => {
-  const o = document.createElement('option');
-  o.value = u.code;
-  o.textContent = `${u.name} (${u.code})`;
-  underSel.appendChild(o);
-});
+const D = { index:null, data:{}, loadedAt:null };
 
-// ══════════════════════════════════════════════════════════
-// MARKET STATUS
-// ══════════════════════════════════════════════════════════
+// ═════════ TIME (Beijing) ═════════
+function bjNow() { const d = new Date(Date.now() + 8*3600e3); return d; }   // use getUTC* on this
+function bjParts(d) { return {dow:d.getUTCDay(), m:d.getUTCHours()*60+d.getUTCMinutes()}; }
 function mktStatus() {
-  const d = new Date();
-  const dy = d.getDay();
-  if (dy === 0 || dy === 6) return 'closed';
-  const m = d.getHours() * 60 + d.getMinutes();
-  if (m >= 9*60+15 && m < 9*60+30) return 'pre';
-  if (m >= 9*60+30 && m < 11*60+30) return 'open';
-  if (m >= 13*60 && m < 15*60) return 'open';
+  const {dow, m} = bjParts(bjNow());
+  if (dow === 0 || dow === 6) return 'closed';
+  if (m >= 555 && m < 570) return 'pre';
+  if ((m >= 570 && m < 690) || (m >= 780 && m < 900)) return 'open';
+  if (m >= 690 && m < 780) return 'lunch';
   return 'closed';
 }
-function renderMktStatus() {
-  const s = mktStatus();
-  const dot = document.getElementById('mktDot');
-  const lbl = document.getElementById('mktLabel');
-  dot.className = 'mkt-dot ' + (s==='open'?'dot-open':s==='pre'?'dot-pre':'dot-cls');
-  lbl.textContent = s==='open' ? '交易中 (09:30-15:00)' : s==='pre' ? '集合竞价' : '休市';
+function slotsMin() { const a=[]; for(let t=570;t<=690;t+=10)a.push(t); for(let t=780;t<=890;t+=10)a.push(t); a.push(905); return a; }
+function nextSlotText() {
+  const now = bjNow(); let {dow, m} = bjParts(now);
+  for (let i = 0; i < 8; i++) {
+    const d = (dow + i) % 7;
+    if (d !== 0 && d !== 6) {
+      for (const s of slotsMin()) if (i > 0 || s > m) {
+        const hh = String(Math.floor(s/60)).padStart(2,'0'), mm = String(s%60).padStart(2,'0');
+        if (i === 0) return `${hh}:${mm}`;
+        return (i === 1 ? '明天 ' : ['周日','周一','周二','周三','周四','周五','周六'][d] + ' ') + `${hh}:${mm}`;
+      }
+    }
+  }
+  return '--';
+}
+function ago(iso) {
+  if (!iso) return '';
+  const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  if (mins < 1) return '刚刚';
+  if (mins < 60) return `${mins} 分钟前`;
+  if (mins < 60*24) return `${Math.round(mins/60)} 小时前`;
+  return `${Math.round(mins/1440)} 天前`;
+}
+function renderStatus() {
+  const st = mktStatus();
+  const upd = D.index && D.index.updated;
+  const staleMin = upd ? (Date.now() - new Date(upd).getTime())/60000 : 1e9;
+  const dot = document.getElementById('dot');
+  let label = {open:'交易中', pre:'集合竞价', lunch:'午间休市', closed:'已收盘'}[st];
+  let cls = st === 'open' ? 'open' : st === 'pre' ? 'pre' : '';
+  if (st === 'open' && staleMin > 35) { cls = 'stale'; label = '交易中 · 数据延迟'; }
+  dot.className = 'dot ' + cls;
+  document.getElementById('stMkt').textContent = label + '（北京时间）';
+  document.getElementById('stUpd').textContent = upd ? `${upd.slice(5,10).replace('-','/')} ${upd.slice(11,16)} · ${ago(upd)}` : '--';
+  document.getElementById('stNext').textContent = nextSlotText();
 }
 
-// ══════════════════════════════════════════════════════════
-// MARGIN CALC
-// ══════════════════════════════════════════════════════════
-function calcMargin(strike, premium, underPx, isPut) {
-  if (state.marginMode === 'cash') return strike;
-  let virt;
-  if (isPut) virt = Math.max(underPx - strike, 0);
-  else       virt = Math.max(strike - underPx, 0);
-  const base = premium + Math.max(0.12 * underPx - virt, 0.07 * strike);
-  return base * (1 + state.uplift);
+// ═════════ MATH ═════════
+const ncdf = x => { // Abramowitz-Stegun
+  const t = 1/(1+0.2316419*Math.abs(x)), d = 0.3989423*Math.exp(-x*x/2);
+  const p = d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));
+  return x > 0 ? 1-p : p;
+};
+function probITM(c, spot) {
+  if (c.delta !== null && c.delta !== undefined && Math.abs(c.delta) < 0.999) return Math.abs(c.delta);
+  if (!c.iv || !c.days) return c.delta !== null && c.delta !== undefined ? Math.abs(c.delta) : null;
+  const T = c.days/365, v = c.iv, d1 = (Math.log(spot/c.strike) + (0.018 + v*v/2)*T)/(v*Math.sqrt(T));
+  return c.type === 'P' ? ncdf(-d1) : ncdf(d1);
 }
-
-// ══════════════════════════════════════════════════════════
-// COMPUTE ROW
-// ══════════════════════════════════════════════════════════
-function computeRow(c, S) {
+function calc(c, spot) {
   const isPut = c.type === 'P';
-  let premiumPx;
-  if (state.pxMode === 'bid')      premiumPx = c.bid;
-  else if (state.pxMode === 'mid') premiumPx = (c.bid > 0 && c.ask > 0) ? (c.bid + c.ask) / 2 : c.last;
-  else                              premiumPx = c.last;
-
-  if (!premiumPx || premiumPx <= 0) {
-    return {
-      ...c, underPx: S, isPut, premiumPx: 0,
-      marginPx: 0, premium: 0, margin: 0,
-      yldp: null, yld: null,
-    };
+  const K = c.strike;
+  const px = S.px === 'mid' ? ((c.bid > 0 && c.ask > 0) ? (c.bid + c.ask)/2 : c.bid) : c.bid;
+  const intrinsic = isPut ? Math.max(K - spot, 0) : Math.max(spot - K, 0);
+  const otmAmt = isPut ? Math.max(spot - K, 0) : Math.max(K - spot, 0);
+  const timeVal = Math.max((px || 0) - intrinsic, 0);
+  const mnyPct = spot > 0 ? (isPut ? (spot - K) : (K - spot)) / spot * 100 : 0;   // + = 虚值距离
+  let marginPx, mFormula;
+  if (S.margin === 'cash') {
+    marginPx = isPut ? K : spot;
+  } else {
+    const base = isPut
+      ? Math.min((px||0) + Math.max(0.12*spot - otmAmt, 0.07*K), K)
+      : (px||0) + Math.max(0.12*spot - otmAmt, 0.07*spot);
+    marginPx = base * (1 + S.uplift);
   }
-  const margin = calcMargin(c.strike, premiumPx, S, isPut);
-  const yldp = (premiumPx / margin) * 100;
-  const yld = c.days > 0 ? yldp * (365 / c.days) : null;
-  // Moneyness: 认沽时 strike>spot 是 ITM; 认购反之
-  const intrinsicGap = isPut ? (c.strike - S) : (S - c.strike);
-  const moneynessPct = S > 0 ? (intrinsicGap / S) * 100 : 0;
-  return {
-    ...c, underPx: S, isPut, premiumPx,
-    marginPx: margin,
-    premium: premiumPx * CONTRACT_MULTIPLIER,
-    margin: margin * CONTRACT_MULTIPLIER,
-    yldp, yld,
-    moneynessPct,
-  };
+  const be = isPut ? K - (px||0) : K + (px||0);
+  const cushion = spot > 0 ? (isPut ? (spot - be) : (be - spot)) / spot * 100 : null;
+  const ok = px > 0 && c.days > 0 && marginPx > 0;
+  const yldp = ok ? timeVal / marginPx * 100 : null;
+  const yld = ok ? yldp * 365 / c.days : null;
+  const mid = (c.bid > 0 && c.ask > 0) ? (c.bid + c.ask)/2 : null;
+  const spread = mid ? (c.ask - c.bid) / mid * 100 : null;
+  const adj = /A$/.test(c.name || '') || /A\d*$/.test((c.name||'').replace(/\s/g,''));
+  return {...c, spot, isPut, px: px||0, intrinsic, timeVal, otmAmt, mnyPct, marginPx,
+    premium:(px||0)*MULT, margin: marginPx*MULT, be, cushion, yldp, yld, spread,
+    prob: probITM(c, spot), adj, illiq: c.illiq || !(c.bid > 0) || !(c.ask > 0)};
 }
 
-// ══════════════════════════════════════════════════════════
-// RENDER
-// ══════════════════════════════════════════════════════════
-function pctClass(v) {
-  if (v === null || v === undefined || isNaN(v)) return 'yld-na';
-  if (v >= 50) return 'yld-hi';
-  if (v >= 20) return 'yld-md';
-  if (v >= 5)  return 'yld-lo';
-  return 'yld-na';
+// ═════════ FORMAT ═════════
+const f = (v, d=2) => (v === null || v === undefined || isNaN(v)) ? '--' : Number(v).toFixed(d);
+const fi = v => (v === null || v === undefined || isNaN(v)) ? '--' : Math.round(v).toLocaleString('zh-CN');
+const pctTxt = (v, d=1) => (v === null || v === undefined || isNaN(v)) ? '--' : Number(v).toFixed(d) + '%';
+function yCls(v) { if (v === null || isNaN(v)) return 'y4'; return v >= 30 ? 'y1' : v >= 12 ? 'y2' : v >= 4 ? 'y3' : 'y4'; }
+function mnyTag(p) {
+  if (Math.abs(p) < 1) return `<span class="tag t-atm">平值</span>`;
+  return p > 0 ? `<span class="tag t-otm">虚值 ${f(p,1)}%</span>` : `<span class="tag t-itm">实值 ${f(-p,1)}%</span>`;
 }
-function fmtInt(v) {
-  if (v === null || v === undefined || isNaN(v)) return '--';
-  return Math.round(v).toLocaleString();
+function probCell(p) {
+  if (p === null || p === undefined) return '--';
+  const pc = p*100, col = pc <= 20 ? 'var(--g)' : pc <= 35 ? 'var(--a)' : 'var(--r)';
+  return `<span class="bar-p"><i style="width:${Math.min(pc,100)}%;background:${col}"></i></span><span class="num">${f(pc,0)}%</span>`;
 }
-function moneynessLabel(pct) {
-  if (Math.abs(pct) < 1) return '平值';
-  return pct > 0 ? '实值' : '虚值';
-}
-function moneynessClass(pct) {
-  if (Math.abs(pct) < 1) return 'tag-atm';
-  return pct > 0 ? 'tag-itm' : 'tag-otm';
-}
+const chgCls = v => v > 0 ? 'up' : v < 0 ? 'dn' : '';
 
-function recompute() {
-  const S = state.underPx;
-  state.rows = state.rawContracts
-    .filter(c => c.type === state.optType)
-    .map(c => computeRow(c, S));
-  renderTable();
+// ═════════ TABLE COLUMNS ═════════
+const TIP = {
+  k:'行权价与合约名。点一行看详细推演。',
+  exp:'到期日 = 到期月第四个星期三。天数为日历日。',
+  mny:'虚值 x% = 标的还要再跌（认沽）/ 涨（认购）x% 才进入实值。',
+  cush:'安全垫 = 到盈亏平衡点的距离。\n认沽平衡点 = 行权价 − 权利金\n认购平衡点 = 行权价 + 权利金\n标的跌（涨）超过这个幅度才开始亏钱。',
+  prob:'到期被行权的概率，用 |Delta| 近似。\n≤20% 绿，20–35% 黄，>35% 红。',
+  iv:'隐含波动率：用中间价按 Black-Scholes 反推。\nIV 越高，期权越贵，卖方收得越多，风险也越大。',
+  ba:'买一 / 卖一 报价。\n卖出时直接成交在买一价；价差% 大于 5% 标黄，说明流动性差。',
+  oi:'今日成交量 / 未平仓持仓量（张）。',
+  prem:'卖出一张可收的权利金 = 成交价 × 10000。',
+  mgn:'一张合约占用的资金。\n现金担保：认沽 = 行权价×10000；认购（备兑）= 标的现价×10000\n交易所：认沽 = min(权利金 + max(12%×标的 − 虚值, 7%×行权价), 行权价)\n认购 = 权利金 + max(12%×标的 − 虚值, 7%×标的)\n再乘(1+券商上浮)',
+  yldp:'持有到期、标的价格不变时的收益率 = 时间价值 ÷ 占用资金。',
+  yld:'年化 = 期间收益 × 365 ÷ 剩余天数。\n只计时间价值，实值部分不算收益。\n灰色行 = 单边报价或无买价，数据仅供参考。',
+};
+function colsDef(withUnder) {
+  const c = [];
+  if (withUnder) c.push({k:'under', t:'标的', l:1, stk:1});
+  c.push({k:'strike', t:'行权价', l:1, stk:!withUnder, tip:TIP.k});
+  c.push({k:'days', t:'到期', l:1, tip:TIP.exp});
+  c.push({k:'yld', t:'年化收益', tip:TIP.yld});
+  c.push({k:'cushion', t:'安全垫', tip:TIP.cush});
+  c.push({k:'prob', t:'行权概率', tip:TIP.prob});
+  c.push({k:'mnyPct', t:'虚实', l:1, tip:TIP.mny});
+  c.push({k:'iv', t:'IV', tip:TIP.iv});
+  c.push({k:'spread', t:'买一 / 卖一', tip:TIP.ba});
+  c.push({k:'openInterest', t:'成交 / 持仓', tip:TIP.oi});
+  c.push({k:'premium', t:'权利金/张', tip:TIP.prem});
+  c.push({k:'margin', t:'占用资金/张', tip:TIP.mgn});
+  c.push({k:'yldp', t:'期间收益', tip:TIP.yldp});
+  return c;
 }
-
-function renderTable() {
-  const tbody = document.getElementById('tbody');
-  if (!state.rows.length) {
-    tbody.innerHTML = '<tr class="load-row"><td colspan="10">暂无数据</td></tr>';
-    return;
-  }
-  const sk = state.sortKey, sd = state.sortDir;
-  const sinks = r => r.illiq;
-  const sorted = [...state.rows].sort((a, b) => {
-    const sa = sinks(a), sb = sinks(b);
-    if (sa !== sb) return sa ? 1 : -1;
-    let va, vb;
-    if (sk === 'bid')      { va = a.bid; vb = b.bid; }
-    else if (sk === 'expiry')   { va = a.days; vb = b.days; }
-    else if (sk === 'moneyness'){ va = a.moneynessPct; vb = b.moneynessPct; }
-    else { va = a[sk]; vb = b[sk]; }
-    if (va === null || va === undefined) va = sd === -1 ? -Infinity : Infinity;
-    if (vb === null || vb === undefined) vb = sd === -1 ? -Infinity : Infinity;
-    return sd * (va < vb ? -1 : va > vb ? 1 : 0);
+function headHTML(cols, sort, which) {
+  return '<tr>' + cols.map(c => {
+    const on = sort[0] === c.k;
+    return `<th class="${c.l?'l ':''}${c.stk?'stk ':''}${on?'on':''}" onclick="sortBy('${which}','${c.k}')">${c.t}${c.tip?`<span class="q" data-tip="${c.tip.replace(/"/g,'&quot;')}">?</span>`:''}<span class="ar">${on ? (sort[1] < 0 ? '↓' : '↑') : ''}</span></th>`;
+  }).join('') + '</tr>';
+}
+function rowHTML(r, withUnder) {
+  const u = UNDERLYINGS.find(x => x.code === r.uc);
+  const ba = `<span class="b">${r.bid > 0 ? f(r.bid,4) : '无'}</span><span class="s"> / </span><span class="a">${r.ask > 0 ? f(r.ask,4) : '无'}</span>`;
+  const sp = r.spread !== null ? `<span class="sub ${r.spread > 5 ? 'wide' : ''}">价差 ${f(r.spread,1)}%</span>` : '<span class="sub">单边报价</span>';
+  return `<tr class="${r.illiq?'ill':''}" onclick="openMdl('${r.uc}','${r.code}')">
+    ${withUnder ? `<td class="l stk"><b style="font-weight:600">${uname(u)}</b><span class="sub num">${u.code}</span></td>` : ''}
+    <td class="l ${withUnder?'':'stk'}"><span class="k">${f(r.strike, r.strike < 10 ? 3 : 0)}</span><span class="sub">${r.name}${r.adj?' · 调整合约':''}</span></td>
+    <td class="l"><span class="num">${(r.expiry||'').slice(5)}</span><span class="sub">${r.days} 天</span></td>
+    <td><span class="y ${yCls(r.yld)}">${pctTxt(r.yld)}</span></td>
+    <td class="num" style="color:${r.cushion > 5 ? 'var(--tx)' : r.cushion > 0 ? 'var(--a)' : 'var(--r)'}">${pctTxt(r.cushion)}</td>
+    <td>${probCell(r.prob)}</td>
+    <td class="l">${mnyTag(r.mnyPct)}</td>
+    <td class="num">${r.iv ? pctTxt(r.iv*100) : '--'}</td>
+    <td class="ba num">${ba}${sp}</td>
+    <td class="num">${fi(r.volume)}<span class="sub num">持仓 ${fi(r.openInterest)}</span></td>
+    <td class="num">${fi(r.premium)}</td>
+    <td class="num">${fi(r.margin)}</td>
+    <td class="num">${r.yldp !== null ? f(r.yldp,2)+'%' : '--'}</td>
+  </tr>`;
+}
+function sortRows(rows, [k, dir]) {
+  return rows.sort((a, b) => {
+    if (a.illiq !== b.illiq) return a.illiq ? 1 : -1;
+    let va = a[k], vb = b[k];
+    if (k === 'under') { va = a.uc; vb = b.uc; }
+    if (va === null || va === undefined || isNaN(va) && typeof va !== 'string') va = dir < 0 ? -Infinity : Infinity;
+    if (vb === null || vb === undefined || isNaN(vb) && typeof vb !== 'string') vb = dir < 0 ? -Infinity : Infinity;
+    return dir * (va < vb ? -1 : va > vb ? 1 : 0);
   });
+}
+function sortBy(which, k) {
+  const key = which === 'pick' ? 'sortPick' : 'sortChain';
+  const cur = S[key];
+  S[key] = cur[0] === k ? [k, -cur[1]] : [k, ['strike','days','prob','spread','margin'].includes(k) ? 1 : -1];
+  save(); render();
+}
 
-  tbody.innerHTML = sorted.map(r => {
-    const yld = (r.yld === null || isNaN(r.yld)) ? '--' : r.yld.toFixed(1) + '%';
-    const yldp = (r.yldp === null || isNaN(r.yldp)) ? '--' : r.yldp.toFixed(2) + '%';
-    const yldCls = pctClass(r.yld);
-    const expStr = r.expiry ? r.expiry.slice(5) : '--';
-    const daysStr = r.days + '天';
-    const mLab = moneynessLabel(r.moneynessPct);
-    const mCls = moneynessClass(r.moneynessPct);
-    const bid = r.bid > 0 ? r.bid.toFixed(4) : '<span style="color:var(--td)">无</span>';
-    const ask = r.ask > 0 ? r.ask.toFixed(4) : '<span style="color:var(--td)">无</span>';
-    const iv = r.iv !== null && r.iv !== undefined ? (r.iv * 100).toFixed(1) + '%' : '<span class="yld-na">--</span>';
-    return `<tr class="clickable${r.illiq ? ' illiq' : ''}" onclick="openMdl('${r.code}')">
-      <td><div class="tk-name mono">${r.strike.toFixed(4)}</div><div style="font-size:10px;color:var(--td)">${r.name}</div></td>
-      <td><div class="mono">${expStr}</div><div style="font-size:10px;color:var(--td)">${daysStr}</div></td>
-      <td><span class="tag ${mCls}">${mLab}</span> <span class="mono" style="font-size:11px">${r.moneynessPct >= 0 ? '+' : ''}${r.moneynessPct.toFixed(2)}%</span></td>
-      <td class="bid-ask"><span class="b">${bid}</span><span class="sep"> / </span><span class="a">${ask}</span></td>
-      <td><div class="mono">${fmtInt(r.volume)}</div><div style="font-size:10px;color:var(--td)">持仓 ${fmtInt(r.openInterest)}</div></td>
-      <td class="mono">${iv}</td>
-      <td class="mono">${fmtInt(r.premium)} 元</td>
-      <td class="mono">${fmtInt(r.margin)} 元</td>
-      <td class="${pctClass(r.yldp)}">${yldp}</td>
-      <td class="${yldCls}" style="font-size:14px">${yld}</td>
+// ═════════ RENDER: PICK ═════════
+function rowsFor(code) {
+  const d = D.data[code]; if (!d) return [];
+  const spot = d._meta.spot.price;
+  return (d.contracts || []).filter(c => c.type === S.type).map(c => ({...calc(c, spot), uc: code}));
+}
+function renderPick() {
+  const cols = colsDef(true);
+  document.getElementById('pickHead').innerHTML = headHTML(cols, S.sortPick, 'pick');
+  const body = document.getElementById('pickBody');
+  const loaded = Object.keys(D.data).length;
+  if (!loaded) return;
+  const [d0, d1] = S.days.split('-').map(Number), oi = +S.oi, per = +S.per;
+  let all = [];
+  for (const u of UNDERLYINGS) all.push(...rowsFor(u.code));
+  let rows = all.filter(r => !r.illiq && !r.adj && r.mnyPct > -0.5 && r.days >= d0 && r.days <= d1
+    && r.openInterest >= oi && r.prob !== null && r.prob <= S.fDelta + 1e-9 && r.yld !== null && r.yld > 0);
+  rows = sortRows(rows, S.sortPick);
+  if (per < 99) { const cnt = {}; rows = rows.filter(r => (cnt[r.uc] = (cnt[r.uc]||0) + 1) <= per); }
+  const shown = rows.slice(0, 40);
+  document.getElementById('pickCnt').textContent = rows.length ? rows.length : '';
+  body.innerHTML = shown.length ? shown.map(r => rowHTML(r, true)).join('')
+    : `<tr class="empty"><td colspan="${cols.length}">没有符合条件的合约，放宽「行权概率」或「剩余天数」试试</td></tr>`;
+}
+
+// ═════════ RENDER: CHAIN ═════════
+function renderChips() {
+  const d = D.data[S.under]; const el = document.getElementById('expChips');
+  if (!d) { el.innerHTML = ''; return; }
+  const m = new Map();
+  for (const c of d.contracts) if (c.type === S.type && c.expiry && !m.has(c.expiry.slice(0,7))) m.set(c.expiry.slice(0,7), c.days);
+  const list = [...m.entries()].sort((a,b) => a[1]-b[1]);
+  if (S.expiry !== 'all' && !m.has(S.expiry)) S.expiry = 'all';
+  el.innerHTML = `<span class="lab" style="margin-right:4px">到期月</span><button class="chip ${S.expiry==='all'?'on':''}" onclick="setExp('all')">全部</button>` +
+    list.map(([k, days]) => `<button class="chip ${S.expiry===k?'on':''}" onclick="setExp('${k}')">${+k.slice(5)}月<small>${days}天</small></button>`).join('');
+}
+function setExp(k) { S.expiry = k; render(); }
+function renderChain() {
+  const cols = colsDef(false);
+  document.getElementById('chainHead').innerHTML = headHTML(cols, S.sortChain, 'chain');
+  renderChips();
+  const sel = document.getElementById('underSel');
+  if (!sel.options.length) sel.innerHTML = UNDERLYINGS.map(u => `<option value="${u.code}">${uname(u)} ${u.code}</option>`).join('');
+  sel.value = S.under;
+  const dd = D.data[S.under], sp = dd && dd._meta.spot;
+  const ch = sp && sp.prevClose ? (sp.price/sp.prevClose - 1)*100 : null;
+  document.getElementById('chainSpot').innerHTML = sp ? `现价 <b>${f(sp.price,3)}</b> <span class="${chgCls(ch)}">${ch !== null ? (ch>0?'+':'') + f(ch,2) + '%' : ''}</span>` : '';
+  const body = document.getElementById('chainBody');
+  if (!D.data[S.under]) { body.innerHTML = `<tr class="empty"><td colspan="${cols.length}"><span class="lsp"></span>加载中…</td></tr>`; return; }
+  let rows = rowsFor(S.under).filter(r =>
+    (S.expiry === 'all' || (r.expiry||'').startsWith(S.expiry)) &&
+    (S.mny === 'all' || (S.mny === 'otm' ? r.mnyPct > -1 : r.mnyPct <= -1)) &&
+    r.openInterest >= +S.coi);
+  rows = sortRows(rows, S.sortChain);
+  body.innerHTML = rows.length ? rows.map(r => rowHTML(r, false)).join('') : `<tr class="empty"><td colspan="${cols.length}">暂无数据</td></tr>`;
+}
+
+// ═════════ RENDER: IV ═════════
+function spark(series, w=132, h=34) {
+  const v = series.filter(x => x !== null && x !== undefined);
+  if (v.length < 3) return '<span class="sub">样本不足</span>';
+  const mn = Math.min(...v), mx = Math.max(...v), rg = (mx - mn) || 1;
+  const pts = v.map((x, i) => `${(i/(v.length-1)*w).toFixed(1)},${(h - 3 - (x-mn)/rg*(h-6)).toFixed(1)}`);
+  const last = pts[pts.length-1].split(',');
+  return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline points="${pts.join(' ')}" fill="none" stroke="var(--b)" stroke-width="1.5" stroke-linejoin="round"/><circle cx="${last[0]}" cy="${last[1]}" r="2.8" fill="var(--g)"/></svg>`;
+}
+function renderIV() {
+  const head = document.getElementById('ivHead'), body = document.getElementById('ivBody');
+  if (!D.index || !Object.keys(D.data).length) return;
+  const type = S.type, idx = type === 'P' ? 1 : 2;
+  const exMap = new Map();
+  for (const code in D.data) for (const c of D.data[code].contracts) if (c.type === type && c.expiry) {
+    const k = c.expiry.slice(0,7); if (!exMap.has(k)) exMap.set(k, c.days);
+  }
+  const exps = [...exMap.entries()].sort((a,b) => a[1]-b[1]).slice(0, 4);
+  const pickIv = (d, k) => {
+    const spot = d._meta.spot.price, target = S.ivk === 'atm' ? spot : (type === 'P' ? spot*0.95 : spot*1.05);
+    const cs = d.contracts.filter(c => c.type === type && (c.expiry||'').startsWith(k) && c.iv && !c.illiq);
+    cs.sort((a,b) => Math.abs(a.strike-target) - Math.abs(b.strike-target));
+    return cs[0] || null;
+  };
+  const grid = UNDERLYINGS.map(u => { const d = D.data[u.code]; return exps.map(([k]) => d ? pickIv(d, k) : null); });
+  const colMax = exps.map((_, j) => Math.max(0, ...grid.map(r => r[j] ? r[j].iv : 0)));
+  head.innerHTML = `<tr><th class="l stk">标的</th><th>当前 IV<span class="q" data-tip="最近一个剩余≥15天的到期月，平值合约的 IV。">?</span></th><th>历史分位<span class="q" data-tip="当前 IV 在全部历史交易日中的百分位。\n≥70% 偏贵（利于卖方），≤30% 偏便宜。">?</span></th><th>区间</th><th class="l">走势</th>` +
+    exps.map(([k, days]) => `<th>${+k.slice(5)}月<span class="sub">${days} 天</span></th>`).join('') + '</tr>';
+  body.innerHTML = UNDERLYINGS.map((u, i) => {
+    const iu = (D.index.underlyings || []).find(x => x.code === u.code) || {};
+    const ser = (iu.ivSeries || []).map(x => x[idx]).filter(x => x !== null && x !== undefined);
+    const cur = ser.length ? ser[ser.length-1] : null;
+    let pct = null, mn = null, mx = null;
+    if (ser.length >= 10) { mn = Math.min(...ser); mx = Math.max(...ser); pct = ser.filter(x => x < cur).length / (ser.length - 1) * 100; }
+    const pc = pct === null ? '' : pct >= 70 ? 'hi' : pct <= 30 ? 'lo' : 'md';
+    const d = D.data[u.code];
+    return `<tr onclick="selUnder('${u.code}','chain')"><td class="l stk"><b style="font-weight:600">${uname(u)}</b><span class="sub num">${u.code} · ${d ? f(d._meta.spot.price,3) : '--'}</span></td>
+      <td class="num" style="font-weight:600;font-size:15px">${cur !== null ? pctTxt(cur*100) : '--'}</td>
+      <td>${pct !== null ? `<span class="pct ${pc}">${f(pct,0)}%</span><span class="sub">${ser.length} 个交易日</span>` : '<span class="sub">累积中</span>'}</td>
+      <td class="num">${mn !== null ? `${f(mn*100,1)} – ${f(mx*100,1)}%` : '--'}</td>
+      <td class="l">${spark(ser.slice(-120))}</td>
+      ${grid[i].map((c, j) => c ? `<td><span class="ivc ${Math.abs(c.iv - colMax[j]) < 1e-9 ? 'top' : ''}">${pctTxt(c.iv*100)}</span><span class="ivk">K ${f(c.strike,3)}</span></td>` : '<td class="num" style="color:var(--tx3)">--</td>').join('')}
     </tr>`;
   }).join('');
 }
 
-// ══════════════════════════════════════════════════════════
-// SORT
-// ══════════════════════════════════════════════════════════
-const SORT_COLS = ['strike','expiry','moneyness','bid','volume','iv','premium','margin','yldp','yld'];
-function sortBy(key) {
-  if (state.sortKey === key) state.sortDir *= -1;
-  else { state.sortKey = key; state.sortDir = -1; }
-  updateSortUI();
-  renderTable();
+// ═════════ STRIP ═════════
+function renderStrip() {
+  const el = document.getElementById('strip');
+  el.innerHTML = UNDERLYINGS.map(u => {
+    const iu = D.index && (D.index.underlyings || []).find(x => x.code === u.code);
+    const sp = iu && iu.spot, chg = sp && sp.prevClose ? (sp.price/sp.prevClose - 1)*100 : null;
+    const ser = iu && iu.ivSeries || [], iv = ser.length ? ser[ser.length-1][S.type === 'P' ? 1 : 2] : null;
+    return `<button class="uc ${S.under === u.code && S.view === 'chain' ? 'on' : ''}" onclick="selUnder('${u.code}','chain')">
+      <div class="uc-n">${uname(u)}</div><div class="uc-c">${u.code}</div>
+      <div class="uc-p"><span class="uc-px">${sp ? f(sp.price,3) : '--'}</span><span class="uc-ch ${chgCls(chg)}">${chg !== null ? (chg>0?'+':'') + f(chg,2) + '%' : ''}</span></div>
+      <div class="uc-iv">IV <b>${iv ? pctTxt(iv*100) : '--'}</b></div></button>`;
+  }).join('');
 }
-function updateSortUI() {
-  SORT_COLS.forEach(k => {
-    const th = document.getElementById('th_'+k);
-    const sa = document.getElementById('sa_'+k);
-    if (!th) return;
-    if (state.sortKey === k) {
-      th.classList.add('srt');
-      sa.textContent = state.sortDir === -1 ? '↓' : '↑';
-    } else {
-      th.classList.remove('srt');
-      sa.textContent = '↕';
-    }
+
+function render() {
+  renderStrip(); renderStatus();
+  if (S.view === 'pick') renderPick();
+  else if (S.view === 'chain') renderChain();
+  else renderIV();
+}
+
+// ═════════ CONTROLS ═════════
+function syncSeg() {
+  document.querySelectorAll('.seg[data-k]').forEach(seg => {
+    const k = seg.dataset.k;
+    seg.querySelectorAll('button').forEach(b => b.classList.toggle('on', String(S[k]) === b.dataset.v));
   });
+  document.getElementById('upliftFld').style.display = S.margin === 'exchange' ? 'flex' : 'none';
+  document.getElementById('uplift').value = Math.round(S.uplift*100);
+  document.getElementById('upliftV').textContent = Math.round(S.uplift*100) + '%';
+  document.getElementById('fDelta').value = Math.round(S.fDelta*100);
+  document.getElementById('fDeltaV').textContent = Math.round(S.fDelta*100) + '%';
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.view === S.view));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('on', v.id === 'v-' + S.view));
 }
+document.querySelectorAll('.seg[data-k]').forEach(seg => seg.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  S[seg.dataset.k] = b.dataset.v; save(); syncSeg(); render();
+}));
+document.getElementById('uplift').addEventListener('input', e => { S.uplift = e.target.value/100; save(); syncSeg(); render(); });
+document.getElementById('fDelta').addEventListener('input', e => { S.fDelta = e.target.value/100; save(); syncSeg(); render(); });
+function setView(v) { S.view = v; save(); syncSeg(); render(); }
+function selUnder(code, view) { S.under = code; S.expiry = 'all'; if (view) S.view = view; save(); syncSeg(); render(); window.scrollTo({top: document.querySelector('.tabs').offsetTop - 70, behavior:'smooth'}); }
 
-// ══════════════════════════════════════════════════════════
-// HANDLERS
-// ══════════════════════════════════════════════════════════
-function onChangeUnder() {
-  state.under = UNDERLYINGS.find(u => u.code === underSel.value);
-  doRefresh();
+// ═════════ TOOLTIP (body-level, never clipped) ═════════
+const tt = document.getElementById('tt'); let ttEl = null;
+function showTip(el) {
+  ttEl = el; tt.textContent = el.dataset.tip; tt.classList.add('on');
+  const r = el.getBoundingClientRect(), w = tt.offsetWidth, h = tt.offsetHeight;
+  let x = r.left + r.width/2 - w/2; x = Math.max(10, Math.min(x, innerWidth - w - 10));
+  let y = r.bottom + 8; if (y + h > innerHeight - 10) y = r.top - h - 8;
+  tt.style.left = x + 'px'; tt.style.top = y + 'px';
 }
-function setOptType(t) {
-  state.optType = t;  // 'P' or 'C'
-  document.getElementById('optPut').classList.toggle('on', t === 'P');
-  document.getElementById('optCall').classList.toggle('on', t === 'C');
-  recompute();
-}
-function setMarginMode(m) {
-  state.marginMode = m;
-  document.getElementById('mmCash').classList.toggle('on', m === 'cash');
-  document.getElementById('mmEx').classList.toggle('on', m === 'exchange');
-  document.getElementById('upliftGrp').style.display = m === 'exchange' ? 'flex' : 'none';
-  recompute();
-}
-function onUpliftChange(v) {
-  state.uplift = parseInt(v) / 100;
-  document.getElementById('upliftVal').textContent = v + '%';
-  recompute();
-}
-function setPxMode(m) {
-  state.pxMode = m;
-  ['bid','mid','last'].forEach(k => document.getElementById('px'+k.charAt(0).toUpperCase()+k.slice(1)).classList.toggle('on', k === m));
-  recompute();
-}
-document.querySelectorAll('.tip').forEach(t => t.addEventListener('click', e => e.stopPropagation()));
+function hideTip() { ttEl = null; tt.classList.remove('on'); }
+document.addEventListener('mouseover', e => { const el = e.target.closest('[data-tip]'); if (el) showTip(el); else if (ttEl) hideTip(); });
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-tip]');
+  if (el) { e.stopPropagation(); e.preventDefault(); ttEl === el ? hideTip() : showTip(el); } else hideTip();
+}, true);
+addEventListener('scroll', hideTip, true);
 
-// ══════════════════════════════════════════════════════════
-// REFRESH (load JSON)
-// ══════════════════════════════════════════════════════════
-async function doRefresh() {
-  if (state.loading) return;
-  state.loading = true;
-  clearInterval(state.cdTimer);
-  document.getElementById('cdTimer').textContent = '加载中…';
-  const btn = document.getElementById('rfBtn');
-  const ic = document.getElementById('rfIcon');
-  btn.classList.add('loading');
-  ic.style.animation = 'spin .7s linear infinite';
-  const errBar = document.getElementById('errBar');
-  errBar.style.display = 'none';
-
-  if (state.rows.length === 0) {
-    document.getElementById('tbody').innerHTML =
-      `<tr class="load-row"><td colspan="10"><span class="lspin"></span>加载 ${state.under.name} 期权数据...</td></tr>`;
-  }
-
-  try {
-    const resp = await fetch(`/data/${state.under.code}.json?_=${Date.now()}`);
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const j = await resp.json();
-
-    state.underPx = j._meta.spot.price || 0;
-    state.underChg = j._meta.spot.prevClose > 0
-      ? ((state.underPx / j._meta.spot.prevClose - 1) * 100)
-      : 0;
-    state.underName = j._meta.spot.name || state.under.name;
-    state.dataUpdated = j._meta.updated || '';
-    state.rawContracts = j.contracts || [];
-
-    document.getElementById('underName').textContent = state.underName;
-    document.getElementById('underPrice').textContent = state.underPx > 0 ? state.underPx.toFixed(4) : '--';
-    const chgEl = document.getElementById('underChg');
-    const sign = state.underChg >= 0 ? '+' : '';
-    chgEl.textContent = sign + state.underChg.toFixed(2) + '%';
-    chgEl.style.color = state.underChg >= 0 ? 'var(--g)' : 'var(--r)';
-
-    recompute();
-
-  } catch(e) {
-    console.error(e);
-    errBar.textContent = '⚠ 数据加载失败: ' + e.message;
-    errBar.style.display = 'inline-block';
-    state.rows = [];
-    renderTable();
-  }
-
-  // Show data timestamp (not browser current time — data may be stale by minutes)
-  const t = state.dataUpdated;
-  document.getElementById('updTime').textContent = t ? t.slice(11, 16) : new Date().toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'});
-
-  renderMktStatus();
-  ic.style.animation = '';
-  btn.classList.remove('loading');
-  state.loading = false;
-
-  if (mktStatus() === 'open') startCountdown();
-  else document.getElementById('cdTimer').textContent = '休市';
-}
-
-function startCountdown() {
-  clearInterval(state.cdTimer);
-  state.cdSec = 60;
-  document.getElementById('cdTimer').textContent = '60s';
-  state.cdTimer = setInterval(() => {
-    state.cdSec--;
-    document.getElementById('cdTimer').textContent = state.cdSec + 's';
-    if (state.cdSec <= 0) { clearInterval(state.cdTimer); doRefresh(); }
-  }, 1000);
-}
-
-// ══════════════════════════════════════════════════════════
-// MODAL (share card)
-// ══════════════════════════════════════════════════════════
-function fmt4(v) { return (v === null || v === undefined || isNaN(v)) ? '--' : Number(v).toFixed(4); }
-function fmtPct(v, d=2) { return (v === null || v === undefined || isNaN(v)) ? '--' : (v>=0?'+':'') + Number(v).toFixed(d) + '%'; }
-
-function openMdl(code) {
-  const r = state.rows.find(x => x.code === code);
-  if (!r) return;
-  const optTypeLabel = r.isPut ? '认沽 PUT' : '认购 CALL';
-  const mLab = moneynessLabel(r.moneynessPct);
-  const mCls = moneynessClass(r.moneynessPct);
-  const yldCls = pctClass(r.yld);
-
-  let mgnFormula;
-  if (state.marginMode === 'cash') {
-    mgnFormula = `保证金 = 行权价 × 10000
-         = ${r.strike} × 10000
-         = <b>${fmtInt(r.margin)}</b> 元`;
-  } else {
-    const virt = r.isPut ? Math.max(r.underPx - r.strike, 0) : Math.max(r.strike - r.underPx, 0);
-    const term1 = 0.12 * r.underPx - virt;
-    const term2 = 0.07 * r.strike;
-    mgnFormula = `${r.isPut ? '认沽' : '认购'}虚值 = max(标的−行权, 0) = ${virt.toFixed(4)}
-保证金/份 = 权利金 + max(12%×标的−虚值, 7%×行权价)
-         = ${r.premiumPx.toFixed(4)} + max(${term1.toFixed(4)}, ${term2.toFixed(4)})
-         = <b>${r.marginPx.toFixed(4)}</b>${state.uplift > 0 ? ` × (1+${(state.uplift*100).toFixed(0)}%)` : ''}
-单合约 = <b>${fmtInt(r.margin)}</b> 元`;
-  }
-
-  const dateStr = (state.dataUpdated || '').slice(5,16).replace('T',' ');
-
-  document.getElementById('mdlBody').innerHTML = `
-    <div class="mdl-hd">
-      <div class="mdl-brand"><span class="logo-i">ZX</span>期权卖方收益率</div>
-      <div class="mdl-bdate">${dateStr}</div>
+// ═════════ MODAL ═════════
+function openMdl(uc, code) {
+  const d = D.data[uc]; if (!d) return;
+  const c = d.contracts.find(x => x.code === code); if (!c) return;
+  const r = calc(c, d._meta.spot.price), u = UNDERLYINGS.find(x => x.code === uc);
+  const pxLab = S.px === 'mid' ? '中间价' : '买一价';
+  // payoff scenarios at expiry
+  const moves = r.isPut ? [-15,-10,-5,-r.cushion,0,5] : [-5,0,r.cushion,5,10,15];
+  const beMove = r.isPut ? -r.cushion : r.cushion;
+  const sc = [...new Set(moves.map(m => Math.round(m*10)/10))].filter(m => Math.abs(m - beMove) > 0.15 || m === Math.round(beMove*10)/10)
+    .map(m => Math.abs(m - beMove) < 0.051 ? beMove : m).sort((a,b) => a-b).map(m => {
+    const ST = m === beMove ? r.be : r.spot*(1+m/100);
+    const pay = r.isPut ? Math.max(r.strike - ST, 0) : Math.max(ST - r.strike, 0);
+    const pnl = (r.px - pay) * MULT;
+    // covered call: also ETF P&L; cash-secured put: just option P&L
+    const tot = (!r.isPut && S.margin === 'cash') ? pnl + (ST - r.spot)*MULT : pnl;
+    return `<tr><td class="l num">${m>0?'+':''}${f(m,1)}%${m === beMove ? ' <span class="sub" style="display:inline">平衡点</span>' : ''}</td><td class="num">${f(ST,3)}</td><td class="num" style="color:${tot>=0?'var(--g)':'var(--r)'}">${tot>=0?'+':''}${fi(tot)}</td><td class="num" style="color:${tot>=0?'var(--g)':'var(--r)'}">${f(tot/r.margin*100,2)}%</td></tr>`;
+  }).join('');
+  let mf;
+  if (S.margin === 'cash') mf = r.isPut ? `占用 = 行权价 × 10000 = ${r.strike} × 10000 = <b>${fi(r.margin)}</b> 元` : `占用（备兑）= 标的价 × 10000 = ${f(r.spot,3)} × 10000 = <b>${fi(r.margin)}</b> 元`;
+  else mf = r.isPut
+    ? `虚值额 = max(标的 − 行权价, 0) = ${f(r.otmAmt,4)}\n保证金/份 = min(${f(r.px,4)} + max(12%×${f(r.spot,3)} − ${f(r.otmAmt,4)}, 7%×${r.strike}), ${r.strike})\n× (1 + ${Math.round(S.uplift*100)}%) = <b>${fi(r.margin)}</b> 元/张`
+    : `虚值额 = max(行权价 − 标的, 0) = ${f(r.otmAmt,4)}\n保证金/份 = ${f(r.px,4)} + max(12%×${f(r.spot,3)} − ${f(r.otmAmt,4)}, 7%×${f(r.spot,3)})\n× (1 + ${Math.round(S.uplift*100)}%) = <b>${fi(r.margin)}</b> 元/张`;
+  document.getElementById('mb').innerHTML = `
+    <div class="m-brand"><span class="logo-i">ZX</span>期权卖方收益率 · ${(d._meta.updated||'').slice(0,16).replace('T',' ')}</div>
+    <div class="m-t">${r.name}</div>
+    <div class="m-tags"><span class="tag t-dim">${uname(u)} ${u.code}</span><span class="tag ${r.isPut?'t-otm':'t-atm'}">卖出${r.isPut?'认沽':'认购'}</span>${mnyTag(r.mnyPct)}${r.illiq?'<span class="tag t-dim">单边报价</span>':''}</div>
+    <div class="m-big">
+      <div><span>年化收益</span><b class="${yCls(r.yld)}">${pctTxt(r.yld)}</b></div>
+      <div><span>安全垫</span><b>${pctTxt(r.cushion)}</b></div>
+      <div><span>行权概率</span><b>${r.prob!==null?f(r.prob*100,0)+'%':'--'}</b></div>
     </div>
-
-    <div class="mdl-title">${r.name}</div>
-    <div class="mdl-sub">
-      <span class="tk">${r.code}</span>
-      <span class="b tag-${r.isPut ? 'otm' : 'itm'}">${optTypeLabel}</span>
-      <span class="b ${mCls}">${mLab}</span>
-      ${r.illiq ? `<span class="b" style="background:rgba(100,116,139,.2);color:var(--td)">单边/无流动性</span>` : ''}
+    <div class="m-grid">
+      <div><span>标的现价</span><b>${f(r.spot,3)}</b></div>
+      <div><span>行权价</span><b>${r.strike}</b></div>
+      <div><span>盈亏平衡点</span><b>${f(r.be,4)}</b></div>
+      <div><span>到期日</span><b>${r.expiry} · ${r.days}天</b></div>
+      <div><span>${pxLab}</span><b>${f(r.px,4)}</b></div>
+      <div><span>权利金/张</span><b>${fi(r.premium)} 元</b></div>
+      <div><span>其中时间价值</span><b>${fi(r.timeVal*MULT)} 元</b></div>
+      <div><span>占用资金/张</span><b>${fi(r.margin)} 元</b></div>
+      <div><span>IV / Delta</span><b>${r.iv?pctTxt(r.iv*100):'--'} / ${f(r.delta,3)}</b></div>
+      <div><span>成交 / 持仓</span><b>${fi(r.volume)} / ${fi(r.openInterest)}</b></div>
     </div>
-
-    <div class="mdl-yld-row">
-      <div class="mdl-yld">
-        <div class="mdl-yld-lab">年化收益率</div>
-        <div class="mdl-yld-val ${yldCls}">${r.yld !== null ? (r.yld>=0?'+':'')+r.yld.toFixed(1)+'%' : '--'}</div>
-        <div class="mdl-yld-note">${state.marginMode === 'cash' ? '现金担保' : `交易所×${(1+state.uplift).toFixed(2)}`}</div>
-      </div>
-      <div class="mdl-yld">
-        <div class="mdl-yld-lab">期间收益率</div>
-        <div class="mdl-yld-val ${pctClass(r.yldp)}">${r.yldp !== null ? r.yldp.toFixed(2)+'%' : '--'}</div>
-        <div class="mdl-yld-note">持有 ${r.days} 天</div>
-      </div>
-    </div>
-
-    <div class="mdl-calc">
-      <span class="label">收益率计算</span>
-      <b>${state.pxMode==='bid'?'买一':state.pxMode==='mid'?'中价':'最新'}价</b> = ${r.premiumPx.toFixed(4)} → 单张权利金 <b>${fmtInt(r.premium)}</b> 元
-      ${mgnFormula}
-      年化 = (权利金/保证金) × 365/${r.days} = <b>${r.yld!==null?r.yld.toFixed(1):'--'}%</b>
-    </div>
-
-    <div class="mdl-info">
-      <div class="mdl-info-item">
-        <span class="mdl-info-lab">标的现价</span>
-        <span class="mdl-info-val">${fmt4(r.underPx)}</span>
-      </div>
-      <div class="mdl-info-item">
-        <span class="mdl-info-lab">行权价</span>
-        <span class="mdl-info-val mid">${fmt4(r.strike)}</span>
-      </div>
-      <div class="mdl-info-item">
-        <span class="mdl-info-lab">到期日</span>
-        <span class="mdl-info-val">${r.expiry || '--'}</span>
-      </div>
-      <div class="mdl-info-item">
-        <span class="mdl-info-lab">剩余天数</span>
-        <span class="mdl-info-val ${r.days < 7 ? 'warn' : r.days < 30 ? 'mid' : 'ok'}">${r.days}天</span>
-      </div>
-      <div class="mdl-info-item">
-        <span class="mdl-info-lab">Bid / Ask</span>
-        <span class="mdl-info-val" style="font-size:12px">${r.bid>0?r.bid.toFixed(4):'-'} / ${r.ask>0?r.ask.toFixed(4):'-'}</span>
-      </div>
-      <div class="mdl-info-item">
-        <span class="mdl-info-lab">成交 / 持仓</span>
-        <span class="mdl-info-val" style="font-size:12px">${fmtInt(r.volume)} / ${fmtInt(r.openInterest)}</span>
-      </div>
-      <div class="mdl-info-item">
-        <span class="mdl-info-lab">隐含波动率 IV</span>
-        <span class="mdl-info-val ${r.iv === null || r.iv === undefined ? '' : r.iv > 0.30 ? 'warn' : r.iv > 0.20 ? 'mid' : 'ok'}">${(r.iv !== null && r.iv !== undefined) ? (r.iv*100).toFixed(1) + '%' : '--'}</span>
-      </div>
-      <div class="mdl-info-item">
-        <span class="mdl-info-lab">Delta</span>
-        <span class="mdl-info-val" style="font-size:12px">${r.delta !== null && r.delta !== undefined ? r.delta.toFixed(3) : '--'}</span>
-      </div>
-    </div>
-
-    <div class="mdl-footer">options.zxcapitalgroup.com</div>
-  `;
-  document.getElementById('mdlBg').classList.add('on');
+    <div class="m-h">到期盈亏推演（每张${!r.isPut && S.margin==='cash' ? '，含持有 ETF 涨跌' : ''}）</div>
+    <table class="m-sc"><thead><tr><th class="l">标的涨跌</th><th>到期价</th><th>盈亏 (元)</th><th>收益率</th></tr></thead><tbody>${sc}</tbody></table>
+    <div class="m-h">占用资金计算</div>
+    <div class="m-f">${mf}\n年化 = 时间价值 ${f(r.timeVal,4)} ÷ ${f(r.marginPx,4)} × 365/${r.days} = <b>${pctTxt(r.yld)}</b></div>
+    <div class="m-foot">options.zxcapitalgroup.com · 仅供参考，不构成投资建议</div>`;
+  document.getElementById('mbg').classList.add('on');
   document.body.style.overflow = 'hidden';
 }
-
-function closeMdl(e) {
-  if (e && e.type === 'click' && e.target !== e.currentTarget) return;
-  document.getElementById('mdlBg').classList.remove('on');
-  document.body.style.overflow = '';
-}
+function closeMdl() { document.getElementById('mbg').classList.remove('on'); document.body.style.overflow = ''; }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMdl(); });
 
-// ══════════════════════════════════════════════════════════
-// EXPIRY FILTER (期权链 view)
-// ══════════════════════════════════════════════════════════
-state.expiryFilter = 'all';  // 'all' or YYYY-MM (e.g., '2026-06')
-
-function buildExpiryChips() {
-  const chipsEl = document.getElementById('expiryChips');
-  // unique expiries from raw contracts, sorted by days ascending
-  const uniq = new Map();
-  for (const c of state.rawContracts) {
-    if (c.type !== state.optType) continue;
-    if (!c.expiry) continue;
-    const key = c.expiry.slice(0, 7);  // YYYY-MM
-    if (!uniq.has(key)) uniq.set(key, {expiry: c.expiry, days: c.days, key});
-  }
-  const list = [...uniq.values()].sort((a, b) => a.days - b.days);
-  const labels = ['<span class="ec-lab">到期月份</span>',
-    `<span class="ec-chip${state.expiryFilter === 'all' ? ' on' : ''}" onclick="setExpiry('all')">全部</span>`,
-    ...list.map(e => {
-      const moStr = e.expiry.slice(5, 7) + '月';
-      const onCls = state.expiryFilter === e.key ? ' on' : '';
-      return `<span class="ec-chip${onCls}" onclick="setExpiry('${e.key}')">${moStr}<span class="ec-days">(${e.days}天)</span></span>`;
-    })
-  ];
-  chipsEl.innerHTML = labels.join('');
-}
-function setExpiry(key) {
-  state.expiryFilter = key;
-  buildExpiryChips();
-  recompute();
-}
-
-// Patch recompute to apply expiry filter
-const _origRecompute = recompute;
-recompute = function() {
-  const S = state.underPx;
-  state.rows = state.rawContracts
-    .filter(c => c.type === state.optType)
-    .filter(c => state.expiryFilter === 'all' || (c.expiry && c.expiry.startsWith(state.expiryFilter)))
-    .map(c => computeRow(c, S));
-  renderTable();
-};
-
-// Patch setOptType to rebuild chips
-const _origSetOptType = setOptType;
-setOptType = function(t) {
-  _origSetOptType(t);
-  buildExpiryChips();
-};
-
-// Patch doRefresh to build chips after data loads
-const _origDoRefresh = doRefresh;
-doRefresh = async function() {
-  await _origDoRefresh();
-  buildExpiryChips();
-};
-
-// ══════════════════════════════════════════════════════════
-// VIEW SWITCHING (Chain ↔ IV Compare)
-// ══════════════════════════════════════════════════════════
-state.view = 'chain';
-function setView(v) {
-  state.view = v;
-  document.getElementById('vtChain').classList.toggle('on', v === 'chain');
-  document.getElementById('vtIv').classList.toggle('on', v === 'iv');
-  document.getElementById('viewChain').classList.toggle('on', v === 'chain');
-  document.getElementById('viewIV').classList.toggle('on', v === 'iv');
-  // Always reload on switch — covers cases where first load had partial failures
-  if (v === 'iv') loadIvCompare(true);
-}
-
-// ══════════════════════════════════════════════════════════
-// IV COMPARE (cross-ETF)
-// ══════════════════════════════════════════════════════════
-state.ivLoaded = false;
-state.ivData = {};            // code -> JSON
-state.ivType = 'P';            // 'P' or 'C'
-state.ivStrike = 'atm';        // 'atm' or 'otm5'
-
-function setIvType(t) {
-  state.ivType = t;
-  document.getElementById('ivPut').classList.toggle('on', t === 'P');
-  document.getElementById('ivCall').classList.toggle('on', t === 'C');
-  renderIvCompare();
-}
-function setIvStrike(s) {
-  state.ivStrike = s;
-  document.getElementById('ivAtm').classList.toggle('on', s === 'atm');
-  document.getElementById('ivOtm').classList.toggle('on', s === 'otm5');
-  renderIvCompare();
-}
-
-async function loadIvCompare(force) {
-  if (state.ivLoaded && !force) return renderIvCompare();
-  const body = document.getElementById('ivBody');
-  body.innerHTML = '<div class="iv-load"><span class="lspin"></span>加载 9 个标的数据...</div>';
-  const fetchOne = async (u, attempt) => {
+// ═════════ DATA ═════════
+async function getJSON(url, tries = 2) {
+  for (let i = 0; i < tries; i++) {
     try {
-      const r = await fetch(`/data/${u.code}.json?_=${Date.now()}_${attempt}`);
+      const r = await fetch(`${url}?_=${Date.now()}`, {cache:'no-store'});
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return await r.json();
-    } catch(e) {
-      // Single retry with extra delay
-      if (attempt < 2) {
-        await new Promise(s => setTimeout(s, 600));
-        return fetchOne(u, attempt + 1);
-      }
-      console.warn(`Failed to load ${u.code}:`, e.message);
-      return null;
-    }
-  };
-  const results = await Promise.all(UNDERLYINGS.map(u => fetchOne(u, 1)));
-  state.ivData = {};
-  let ok = 0;
-  UNDERLYINGS.forEach((u, i) => {
-    if (results[i]) { state.ivData[u.code] = results[i]; ok++; }
-  });
-  state.ivLoaded = true;
-  if (ok === 0) {
-    body.innerHTML = `<div class="iv-load" style="color:var(--r)">9 个标的全部加载失败</div>`;
-    return;
+    } catch(e) { if (i === tries - 1) throw e; await new Promise(s => setTimeout(s, 700)); }
   }
-  if (ok < UNDERLYINGS.length) {
-    console.warn(`IV compare: ${ok}/${UNDERLYINGS.length} underlyings loaded`);
-  }
-  renderIvCompare();
 }
-
-function pickIvForExpiry(contracts, spot, expiryKey, type, strikeMode) {
-  // Pick the contract for given expiry month + type + strike preference
-  const candidates = contracts.filter(c =>
-    c.type === type && c.expiry && c.expiry.startsWith(expiryKey) && c.iv !== null && c.iv !== undefined && !c.illiq
-  );
-  if (!candidates.length) return null;
-  let targetStrike;
-  if (strikeMode === 'atm') {
-    targetStrike = spot;
-  } else {  // otm5
-    // OTM 5% means: for put, strike 5% below spot; for call, strike 5% above
-    targetStrike = type === 'P' ? spot * 0.95 : spot * 1.05;
+async function loadAll(force) {
+  const err = document.getElementById('err'); err.style.display = 'none';
+  const btn = document.getElementById('rfBtn'); btn.classList.add('spin');
+  try {
+    const idx = await getJSON('data/index.json');
+    const changed = !D.index || D.index.updated !== idx.updated;
+    D.index = idx;
+    if (changed || force || !Object.keys(D.data).length) {
+      const res = await Promise.all(UNDERLYINGS.map(u => getJSON(`data/${u.code}.json`).catch(() => null)));
+      let fail = 0;
+      res.forEach((j, i) => { if (j) D.data[UNDERLYINGS[i].code] = j; else fail++; });
+      if (fail) { err.textContent = `⚠ ${fail} 个标的数据加载失败，稍后自动重试`; err.style.display = 'block'; }
+    }
+  } catch(e) {
+    err.textContent = '⚠ 数据加载失败：' + e.message; err.style.display = 'block';
   }
-  candidates.sort((a, b) => Math.abs(a.strike - targetStrike) - Math.abs(b.strike - targetStrike));
-  return candidates[0];
+  btn.classList.remove('spin');
+  render();
 }
+function manualRefresh() { loadAll(true); }
 
-function renderIvCompare() {
-  const body = document.getElementById('ivBody');
-  if (!state.ivLoaded) return;
-
-  // Collect all unique expiry months across all underlyings
-  const exMap = new Map();
-  for (const code in state.ivData) {
-    const d = state.ivData[code];
-    for (const c of (d.contracts || [])) {
-      if (c.type !== state.ivType || !c.expiry) continue;
-      const key = c.expiry.slice(0, 7);
-      if (!exMap.has(key)) exMap.set(key, c.days);
-    }
-  }
-  const expiries = [...exMap.entries()].sort((a, b) => a[1] - b[1]);
-
-  if (!expiries.length) {
-    body.innerHTML = '<div class="iv-load">无可用数据</div>';
-    return;
-  }
-
-  // For each (underlying, expiry) compute IV + history stats; track best per column
-  // ALWAYS render all 9 UNDERLYINGS rows (even if data missing — show "数据加载失败")
-  const ivTypeKey = state.ivType === 'P' ? 'put' : 'call';
-  const rows = UNDERLYINGS.map(u => {
-    const d = state.ivData[u.code];
-    if (!d) {
-      return {u, spot: 0, cells: expiries.map(() => null), name: u.name, missing: true};
-    }
-    const spot = d._meta.spot.price;
-    const ivStats = (d._meta && d._meta.ivStats30D) || {};
-    const cells = expiries.map(([key, days]) => {
-      const pick = pickIvForExpiry(d.contracts, spot, key, state.ivType, state.ivStrike);
-      if (!pick) return null;
-      const stats = (ivStats[key] && ivStats[key][ivTypeKey]) || null;
-      return {iv: pick.iv, strike: pick.strike, name: pick.name, code: pick.code, stats};
-    });
-    return {u, spot, cells, name: d._meta.spot.name || u.name, missing: false};
-  });
-
-  // Find max IV per column (for highlighting)
-  const colMax = expiries.map((_, i) => {
-    let max = 0;
-    for (const r of rows) {
-      if (r.cells[i] && r.cells[i].iv > max) max = r.cells[i].iv;
-    }
-    return max;
-  });
-
-  // Render
-  let html = `<table><thead><tr>
-    <th>标的 / 现价</th>
-    ${expiries.map(([key, days]) => {
-      const mo = key.slice(5, 7) + '月';
-      return `<th><span class="th-mo">${mo}</span><span class="th-days">${days}天</span></th>`;
-    }).join('')}
-  </tr></thead><tbody>`;
-
-  for (const r of rows) {
-    if (r.missing) {
-      html += `<tr><td><div class="iv-name">${r.name}<span class="sub">${r.u.code} · 数据未加载</span></div></td>`;
-      r.cells.forEach(() => { html += `<td><span class="iv-cell na">--</span></td>`; });
-      html += `</tr>`;
-      continue;
-    }
-    html += `<tr><td><div class="iv-name">${r.name}<span class="sub">${r.u.code} · 现价 ${r.spot.toFixed(4)}</span></div></td>`;
-    r.cells.forEach((cell, i) => {
-      if (!cell) {
-        html += `<td><span class="iv-cell na">--</span></td>`;
-        return;
-      }
-      const ivPct = (cell.iv * 100).toFixed(1) + '%';
-      const isTop = colMax[i] > 0 && Math.abs(cell.iv - colMax[i]) < 1e-6;
-      const cls = isTop ? 'top' : (cell.iv >= 0.20 ? 'high' : cell.iv >= 0.12 ? 'mid' : 'low');
-
-      // Historical IV: show 30D percentile / avg if available
-      // (Higher percentile = today's IV is unusually high → good for sell-side)
-      let metaLine = '';
-      if (cell.stats && cell.stats.count >= 5) {
-        const pct = cell.stats.percentile;
-        const avg = cell.stats.avg * 100;
-        const pctCls = pct >= 70 ? 'hi' : pct <= 30 ? 'lo' : 'mid';
-        const arrow = pct >= 70 ? '↑' : pct <= 30 ? '↓' : '→';
-        metaLine = `<div class="iv-meta"><span class="pct ${pctCls}">${arrow} ${pct.toFixed(0)}%ile</span> <span class="ki">30D avg ${avg.toFixed(1)}%</span></div>`;
-      } else if (cell.stats && cell.stats.count > 0) {
-        metaLine = `<div class="iv-meta"><span class="ki">历史累积中 (${cell.stats.count}天)</span></div>`;
-      }
-      const strikeLine = `<div class="iv-strike">K=${cell.strike.toFixed(3)}</div>`;
-      html += `<td><div class="iv-cell-wrap"><span class="iv-cell ${cls}">${ivPct}</span>${metaLine}${strikeLine}</div></td>`;
-    });
-    html += `</tr>`;
-  }
-  html += `</tbody></table>`;
-  body.innerHTML = html;
-}
-
-// ══════════════════════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════════════════════
-renderMktStatus();
-setInterval(renderMktStatus, 30000);
-doRefresh();
+// ═════════ INIT ═════════
+syncSeg(); render(); loadAll();
+setInterval(() => { renderStatus(); }, 30000);
+setInterval(() => { const s = mktStatus(); if (s === 'open' || s === 'lunch' || s === 'pre') loadAll(); }, 120000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) loadAll(); });
 </script>
 </body></html>
